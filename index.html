@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SARAL — AI-Assisted Civic Road Safety Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- ═══════ FLOATING AMBIENT BLOBS ═══════ -->
+  <div class="ambient-blobs" aria-hidden="true">
+    <div class="blob blob--1"></div>
+    <div class="blob blob--2"></div>
+    <div class="blob blob--3"></div>
+  </div>
+
+  <!-- ═══════ NAVBAR ═══════ -->
+  <nav class="nav" id="nav">
+    <div class="nav__inner">
+      <a href="#" class="nav__logo">
+        <span class="nav__logo-icon">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+            <circle cx="14" cy="14" r="12" stroke="url(#logoGrad)" stroke-width="2.5"/>
+            <path d="M9 14.5L12.5 18L19 11" stroke="url(#logoGrad)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <defs><linearGradient id="logoGrad" x1="0" y1="0" x2="28" y2="28"><stop stop-color="#4F8CFF"/><stop offset="1" stop-color="#A78BFA"/></linearGradient></defs>
+          </svg>
+        </span>
+        <span class="nav__logo-text">SARAL</span>
+      </a>
+
+      <div class="nav__links" id="navLinks">
+        <a href="#about" class="nav__link">About</a>
+        <a href="#how-it-works" class="nav__link">How It Works</a>
+        <a href="#impact" class="nav__link">Impact</a>
+        <a href="#privacy" class="nav__link">Privacy</a>
+        <a href="#rewards" class="nav__link">Rewards</a>
+      </div>
+
+      <div class="nav__actions">
+        <a href="dashboard.html" class="nav__btn nav__btn--ghost">Dashboard</a>
+        <a href="report.html" class="nav__btn nav__btn--primary">
+          <span>Report Now</span>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+      </div>
+
+      <button class="nav__mobile-toggle" id="mobileToggle" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ═══════ HERO SECTION ═══════ -->
+  <section class="hero" id="hero">
+    <div class="hero__bg" aria-hidden="true">
+      <div class="hero__bg-gradient"></div>
+      <div class="hero__bg-grid"></div>
+      <div class="hero__bg-radial"></div>
+    </div>
+
+    <!-- Floating UI Chips -->
+    <div class="hero__chips" aria-hidden="true">
+      <div class="hero__chip hero__chip--1">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5" stroke="#4F8CFF" stroke-width="1.5"/><circle cx="7" cy="7" r="2" fill="#4F8CFF"/></svg>
+        <span>AI + Citizens + Authorities</span>
+      </div>
+      <div class="hero__chip hero__chip--2">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 2L8.5 5H11L9 7.5L10 11L7 9L4 11L5 7.5L3 5H5.5L7 2Z" stroke="#10B981" stroke-width="1.2" fill="none"/></svg>
+        <span>Privacy First</span>
+      </div>
+      <div class="hero__chip hero__chip--3">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="2" y="4" width="10" height="7" rx="1.5" stroke="#F59E0B" stroke-width="1.2"/><path d="M5 4V3a2 2 0 014 0v1" stroke="#F59E0B" stroke-width="1.2"/></svg>
+        <span>Encrypted Reports</span>
+      </div>
+    </div>
+
+    <div class="hero__content">
+      <div class="hero__badge">
+        <span class="hero__badge-dot"></span>
+        Civic AI Platform — Nationwide Beta
+      </div>
+      <h1 class="hero__title">
+        Making Roads<br/>
+        <span class="hero__title-gradient">Safer</span> with<br/>
+        <span class="hero__title-accent">AI-Assisted</span> Reporting
+      </h1>
+      <p class="hero__subtitle">
+        SARAL empowers citizens to report traffic violations anonymously while 
+        AI processes evidence and authorities take swift action — creating a 
+        transparent, accountable road safety ecosystem.
+      </p>
+      <div class="hero__ctas">
+        <a href="report.html" class="btn btn--primary btn--glow">
+          <span>Report a Violation</span>
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M4 9h10M10 5l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <a href="#how-it-works" class="btn btn--outline">
+          <span>See How It Works</span>
+        </a>
+      </div>
+      <div class="hero__stats">
+        <div class="hero__stat">
+          <span class="hero__stat-num" data-count="12847">0</span>
+          <span class="hero__stat-label">Reports Filed</span>
+        </div>
+        <div class="hero__stat-divider"></div>
+        <div class="hero__stat">
+          <span class="hero__stat-num" data-count="89">0</span><span class="hero__stat-suffix">%</span>
+          <span class="hero__stat-label">Action Rate</span>
+        </div>
+        <div class="hero__stat-divider"></div>
+        <div class="hero__stat">
+          <span class="hero__stat-num" data-count="34">0</span>
+          <span class="hero__stat-label">Cities Active</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Curved wave separator -->
+    <div class="hero__wave" aria-hidden="true">
+      <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
+        <path d="M0,60 C360,120 720,0 1080,60 C1260,90 1380,80 1440,60 L1440,120 L0,120Z" fill="var(--bg-primary)"/>
+      </svg>
+    </div>
+  </section>
+
+  <!-- ═══════ TRUST STRIP ═══════ -->
+  <section class="trust">
+    <div class="trust__inner">
+      <span class="trust__label">Trusted by civic bodies across India</span>
+      <div class="trust__logos">
+        <div class="trust__logo">Ministry of Road Transport</div>
+        <div class="trust__logo">NHAI</div>
+        <div class="trust__logo">Smart Cities Mission</div>
+        <div class="trust__logo">Traffic Police</div>
+        <div class="trust__logo">UIDAI Integration</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════ CAPABILITY SHOWCASE ═══════ -->
+  <section class="capabilities" id="about">
+    <div class="capabilities__ambient" aria-hidden="true">
+      <div class="capabilities__glow capabilities__glow--1"></div>
+      <div class="capabilities__glow capabilities__glow--2"></div>
+      <div class="capabilities__glow capabilities__glow--3"></div>
+    </div>
+
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Core Capabilities</span>
+        <h2 class="section-title">
+          Built for <span class="text-gradient">Trust</span>,<br/>Designed for <span class="text-gradient">Scale</span>
+        </h2>
+        <p class="section-desc">
+          Three pillars that make SARAL fundamentally different from 
+          any civic reporting system that came before.
+        </p>
+      </div>
+
+      <!-- Panel 1 — AI Processing -->
+      <div class="cap-panel cap-panel--1" data-reveal>
+        <div class="cap-panel__visual">
+          <div class="cap-panel__scene cap-panel__scene--ai">
+            <!-- AI scan visualization -->
+            <div class="ai-scan">
+              <div class="ai-scan__frame">
+                <div class="ai-scan__grid"></div>
+                <div class="ai-scan__box ai-scan__box--1">
+                  <span class="ai-scan__label">Vehicle Detected</span>
+                </div>
+                <div class="ai-scan__box ai-scan__box--2">
+                  <span class="ai-scan__label">Plate: KA-01-XX</span>
+                </div>
+                <div class="ai-scan__line"></div>
+              </div>
+              <div class="ai-scan__confidence">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5" stroke="#10B981" stroke-width="1.5"/><path d="M5 7l1.5 1.5L9 6" stroke="#10B981" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span>94% Confidence</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="cap-panel__content">
+          <div class="cap-panel__badge">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="3" stroke="#4F8CFF" stroke-width="1.5"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2" stroke="#4F8CFF" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <span>AI Engine</span>
+          </div>
+          <h3 class="cap-panel__title">AI That <em>Understands</em><br/>the Road</h3>
+          <p class="cap-panel__desc">
+            Advanced computer vision models analyze citizen reports in minutes, 
+            identifying violations with high confidence while filtering noise 
+            and ensuring every submission meets evidence standards.
+          </p>
+          <div class="cap-panel__tags">
+            <span class="cap-tag">Computer Vision</span>
+            <span class="cap-tag">License Plate OCR</span>
+            <span class="cap-tag">Violation Classification</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel 2 — Privacy -->
+      <div class="cap-panel cap-panel--2 cap-panel--reverse" data-reveal>
+        <div class="cap-panel__visual">
+          <div class="cap-panel__scene cap-panel__scene--privacy">
+            <!-- Privacy shield visualization -->
+            <div class="privacy-viz">
+              <div class="privacy-viz__shield">
+                <div class="privacy-viz__ring privacy-viz__ring--1"></div>
+                <div class="privacy-viz__ring privacy-viz__ring--2"></div>
+                <div class="privacy-viz__core">
+                  <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                    <path d="M16 3L5 8v7c0 9 4.7 17.4 11 20 6.3-2.6 11-11 11-20V8L16 3z" stroke="url(#privGrad)" stroke-width="2" fill="none"/>
+                    <path d="M11 16l3.5 3.5L21 13" stroke="url(#privGrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <defs><linearGradient id="privGrad" x1="5" y1="3" x2="27" y2="31"><stop stop-color="#10B981"/><stop offset="1" stop-color="#4F8CFF"/></linearGradient></defs>
+                  </svg>
+                </div>
+              </div>
+              <div class="privacy-viz__particles">
+                <div class="privacy-viz__dot privacy-viz__dot--1"></div>
+                <div class="privacy-viz__dot privacy-viz__dot--2"></div>
+                <div class="privacy-viz__dot privacy-viz__dot--3"></div>
+                <div class="privacy-viz__dot privacy-viz__dot--4"></div>
+              </div>
+              <div class="privacy-viz__badge">
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="2" y="5" width="8" height="6" rx="1" stroke="#10B981" stroke-width="1.2"/><path d="M4 5V3.5a2 2 0 014 0V5" stroke="#10B981" stroke-width="1.2"/></svg>
+                <span>Encrypted</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="cap-panel__content">
+          <div class="cap-panel__badge cap-panel__badge--green">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2L3 5v3.5c0 4.5 2.1 8.7 5 10 2.9-1.3 5-5.5 5-10V5L8 2z" stroke="#10B981" stroke-width="1.3" fill="none"/></svg>
+            <span>Zero Knowledge</span>
+          </div>
+          <h3 class="cap-panel__title"><em>Privacy</em> Built Into<br/>the System</h3>
+          <p class="cap-panel__desc">
+            Reporter identity is never exposed. Faces are automatically blurred 
+            and sensitive data is encrypted end-to-end before any authority 
+            review — by design, not by policy.
+          </p>
+          <div class="cap-panel__tags">
+            <span class="cap-tag cap-tag--green">Auto Face Blur</span>
+            <span class="cap-tag cap-tag--green">E2E Encryption</span>
+            <span class="cap-tag cap-tag--green">Zero-Knowledge</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel 3 — Authority -->
+      <div class="cap-panel cap-panel--3" data-reveal>
+        <div class="cap-panel__visual">
+          <div class="cap-panel__scene cap-panel__scene--authority">
+            <!-- Mini dashboard mock -->
+            <div class="auth-mock">
+              <div class="auth-mock__header">
+                <div class="auth-mock__dot auth-mock__dot--red"></div>
+                <div class="auth-mock__dot auth-mock__dot--yellow"></div>
+                <div class="auth-mock__dot auth-mock__dot--green"></div>
+                <span class="auth-mock__title-bar">Case #TR-4821</span>
+              </div>
+              <div class="auth-mock__body">
+                <div class="auth-mock__evidence">
+                  <div class="auth-mock__thumb"></div>
+                  <div class="auth-mock__meta">
+                    <span class="auth-mock__type">Signal Jump</span>
+                    <span class="auth-mock__conf">AI: 96% match</span>
+                  </div>
+                </div>
+                <div class="auth-mock__priority">
+                  <span class="priority-badge priority-badge--high">High Priority</span>
+                </div>
+                <div class="auth-mock__actions">
+                  <button class="auth-mock__btn auth-mock__btn--approve">
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2.5 6L5 8.5 9.5 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Approve
+                  </button>
+                  <button class="auth-mock__btn auth-mock__btn--reject">
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M3 3l6 6M9 3l-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                    Reject
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="cap-panel__content">
+          <div class="cap-panel__badge cap-panel__badge--amber">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 4h12M2 8h12M2 12h8" stroke="#F59E0B" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <span>Decision Platform</span>
+          </div>
+          <h3 class="cap-panel__title">AI Assists.<br/><em>Officers</em> Decide.</h3>
+          <p class="cap-panel__desc">
+            Traffic authorities receive AI-prioritized cases with clear evidence 
+            previews, enabling faster and more consistent enforcement decisions 
+            with full audit trails.
+          </p>
+          <div class="cap-panel__tags">
+            <span class="cap-tag cap-tag--amber">Priority Queue</span>
+            <span class="cap-tag cap-tag--amber">Evidence Preview</span>
+            <span class="cap-tag cap-tag--amber">Audit Trail</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Floating stat highlight -->
+      <div class="cap-stat-float" data-reveal>
+        <div class="cap-stat-float__glow"></div>
+        <div class="cap-stat-float__content">
+          <span class="cap-stat-float__num">3.2×</span>
+          <div class="cap-stat-float__text">
+            <span class="cap-stat-float__headline">Faster Case Resolution</span>
+            <span class="cap-stat-float__sub">Compared to traditional reporting workflows</span>
+          </div>
+        </div>
+        <div class="cap-stat-float__pulse"></div>
+      </div>
+    </div>
+
+    <!-- Wave divider -->
+    <div class="wave-divider wave-divider--organic" aria-hidden="true">
+      <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
+        <path d="M0,60 C180,100 360,20 540,60 C720,100 900,30 1080,70 C1200,90 1350,40 1440,60 L1440,120 L0,120Z" fill="var(--bg-secondary)"/>
+      </svg>
+    </div>
+  </section>
+
+  <!-- ═══════ WORKFLOW TIMELINE ═══════ -->
+  <section class="workflow" id="how-it-works">
+    <div class="workflow__bg" aria-hidden="true">
+      <div class="workflow__bg-grad"></div>
+      <div class="workflow__bg-noise"></div>
+    </div>
+
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag section-tag--light">How It Works</span>
+        <h2 class="section-title section-title--light">
+          From Report to<br/><span class="text-gradient-light">Resolution</span>
+        </h2>
+        <p class="section-desc section-desc--light">
+          A living AI pipeline that transforms citizen reports 
+          into accountability — watch it flow.
+        </p>
+      </div>
+
+      <div class="workflow__pipeline">
+        <!-- Curved road path SVG -->
+        <svg class="workflow__road" viewBox="0 0 1100 200" preserveAspectRatio="none" aria-hidden="true">
+          <defs>
+            <linearGradient id="roadGlow" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#4F8CFF" stop-opacity="0"/>
+              <stop offset="15%" stop-color="#4F8CFF" stop-opacity="1"/>
+              <stop offset="50%" stop-color="#A78BFA"/>
+              <stop offset="85%" stop-color="#10B981" stop-opacity="1"/>
+              <stop offset="100%" stop-color="#10B981" stop-opacity="0"/>
+            </linearGradient>
+            <filter id="roadBlur">
+              <feGaussianBlur in="SourceGraphic" stdDeviation="3"/>
+            </filter>
+          </defs>
+          <!-- Background glow path -->
+          <path class="workflow__road-glow" d="M0,100 C150,40 250,160 400,100 C550,40 650,160 800,100 C900,60 1000,100 1100,100" fill="none" stroke="url(#roadGlow)" stroke-width="6" filter="url(#roadBlur)" opacity="0.4"/>
+          <!-- Main path -->
+          <path class="workflow__road-line" d="M0,100 C150,40 250,160 400,100 C550,40 650,160 800,100 C900,60 1000,100 1100,100" fill="none" stroke="url(#roadGlow)" stroke-width="2" stroke-dasharray="12 6"/>
+          <!-- Traveling light pulse -->
+          <circle class="workflow__pulse" r="5" fill="#4F8CFF" filter="url(#roadBlur)">
+            <animateMotion dur="4s" repeatCount="indefinite" path="M0,100 C150,40 250,160 400,100 C550,40 650,160 800,100 C900,60 1000,100 1100,100"/>
+          </circle>
+        </svg>
+
+        <div class="workflow__nodes">
+          <!-- Node 1 — Citizen Capture -->
+          <div class="workflow__node" data-step="1">
+            <div class="workflow__node-glass">
+              <div class="workflow__node-ring"></div>
+              <div class="workflow__node-inner">
+                <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+                  <rect x="4" y="7" width="20" height="15" rx="3" stroke="currentColor" stroke-width="1.5"/>
+                  <circle cx="14" cy="14.5" r="4" stroke="currentColor" stroke-width="1.5"/>
+                  <circle cx="14" cy="14.5" r="1.5" fill="currentColor"/>
+                  <path d="M10 7V5.5C10 4.67 10.67 4 11.5 4h5c.83 0 1.5.67 1.5 1.5V7" stroke="currentColor" stroke-width="1.5"/>
+                </svg>
+              </div>
+              <div class="workflow__node-badge">01</div>
+              <div class="workflow__node-glow"></div>
+            </div>
+            <div class="workflow__node-info">
+              <h3 class="workflow__node-title">Citizen Capture</h3>
+              <p class="workflow__node-desc">Photo or video evidence is submitted with automatic location and timestamp data.</p>
+            </div>
+          </div>
+
+          <!-- Node 2 — AI Analysis -->
+          <div class="workflow__node" data-step="2">
+            <div class="workflow__node-glass">
+              <div class="workflow__node-ring"></div>
+              <div class="workflow__node-inner">
+                <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+                  <rect x="3" y="5" width="22" height="15" rx="2.5" stroke="currentColor" stroke-width="1.5"/>
+                  <path d="M9 24h10M14 20v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  <circle cx="14" cy="12.5" r="3.5" stroke="currentColor" stroke-width="1.5"/>
+                  <path d="M11 12.5l2 2 3.5-3.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <div class="workflow__node-badge">02</div>
+              <div class="workflow__node-glow"></div>
+            </div>
+            <div class="workflow__node-info">
+              <h3 class="workflow__node-title">AI Evidence Processing</h3>
+              <p class="workflow__node-desc">Models detect violation type, read plates, and protect identities automatically.</p>
+            </div>
+          </div>
+
+          <!-- Node 3 — Authority Review -->
+          <div class="workflow__node" data-step="3">
+            <div class="workflow__node-glass">
+              <div class="workflow__node-ring"></div>
+              <div class="workflow__node-inner">
+                <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+                  <path d="M18 24v-2a5 5 0 00-5-5H9a5 5 0 00-5 5v2" stroke="currentColor" stroke-width="1.5"/>
+                  <circle cx="11" cy="9" r="4" stroke="currentColor" stroke-width="1.5"/>
+                  <path d="M24 24v-2a5 5 0 00-3.5-4.8M19 4.2a5 5 0 010 9.6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <div class="workflow__node-badge">03</div>
+              <div class="workflow__node-glow"></div>
+            </div>
+            <div class="workflow__node-info">
+              <h3 class="workflow__node-title">Official Verification</h3>
+              <p class="workflow__node-desc">Certified traffic officers review flagged cases and make final enforcement decisions.</p>
+            </div>
+          </div>
+
+          <!-- Node 4 — Resolution -->
+          <div class="workflow__node" data-step="4">
+            <div class="workflow__node-glass">
+              <div class="workflow__node-ring"></div>
+              <div class="workflow__node-inner">
+                <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+                  <path d="M24 13.08V14a10 10 0 11-5.93-9.14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  <path d="M24 6L14 16l-3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M10 22l-2 3M18 22l2 3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" opacity="0.5"/>
+                </svg>
+              </div>
+              <div class="workflow__node-badge">04</div>
+              <div class="workflow__node-glow"></div>
+            </div>
+            <div class="workflow__node-info">
+              <h3 class="workflow__node-title">Resolution & Rewards</h3>
+              <p class="workflow__node-desc">Verified outcomes trigger enforcement action and contributor civic rewards.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Wave divider -->
+    <div class="wave-divider wave-divider--dark" aria-hidden="true">
+      <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
+        <path d="M0,40 C240,100 480,10 720,50 C960,90 1200,20 1440,60 L1440,120 L0,120Z" fill="var(--bg-primary)"/>
+      </svg>
+    </div>
+  </section>
+
+  <!-- ═══════ IMPACT ═══════ -->
+  <section class="impact" id="impact">
+    <div class="impact__blobs" aria-hidden="true">
+      <div class="impact__blob impact__blob--1"></div>
+      <div class="impact__blob impact__blob--2"></div>
+    </div>
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Real Impact</span>
+        <h2 class="section-title">
+          Numbers That<br/><span class="text-gradient">Matter</span>
+        </h2>
+        <p class="section-desc">
+          Every report contributes to a safer road ecosystem. 
+          Here's the collective impact of our community.
+        </p>
+      </div>
+
+      <div class="impact__grid">
+        <div class="impact__card impact__card--large" data-reveal>
+          <div class="impact__card-bg"></div>
+          <span class="impact__card-num" data-count="12847">0</span>
+          <span class="impact__card-label">Total Reports Filed</span>
+          <span class="impact__card-trend">↑ 23% this month</span>
+        </div>
+        <div class="impact__card" data-reveal>
+          <div class="impact__card-bg"></div>
+          <span class="impact__card-num" data-count="89">0</span><span class="impact__card-suffix">%</span>
+          <span class="impact__card-label">Action Taken</span>
+        </div>
+        <div class="impact__card" data-reveal>
+          <div class="impact__card-bg"></div>
+          <span class="impact__card-num" data-count="34">0</span>
+          <span class="impact__card-label">Cities Active</span>
+        </div>
+        <div class="impact__card" data-reveal>
+          <div class="impact__card-bg"></div>
+          <span class="impact__card-num" data-count="6521">0</span>
+          <span class="impact__card-label">Active Citizens</span>
+        </div>
+        <div class="impact__card impact__card--accent" data-reveal>
+          <div class="impact__card-bg"></div>
+          <span class="impact__card-num" data-count="47">0</span><span class="impact__card-suffix">min</span>
+          <span class="impact__card-label">Avg. Resolution Time</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="wave-divider wave-divider--flip" aria-hidden="true">
+      <svg viewBox="0 0 1440 80" preserveAspectRatio="none">
+        <path d="M0,40 C240,80 480,0 720,40 C960,80 1200,0 1440,40 L1440,80 L0,80Z" fill="var(--bg-secondary)"/>
+      </svg>
+    </div>
+  </section>
+
+  <!-- ═══════ PRIVACY ═══════ -->
+  <section class="privacy" id="privacy">
+    <div class="container">
+      <div class="privacy__layout">
+        <div class="privacy__text">
+          <span class="section-tag">Privacy & Trust</span>
+          <h2 class="section-title section-title--left">
+            Your Identity Stays<br/><span class="text-gradient">Protected</span>
+          </h2>
+          <p class="section-desc section-desc--left">
+            Built on zero-knowledge principles. Reporter identities are cryptographically 
+            protected. Even platform administrators cannot trace reports to individuals.
+          </p>
+          <div class="privacy__features">
+            <div class="privacy__feature" data-reveal>
+              <div class="privacy__feature-icon">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 18s7-3.5 7-8.5V4.5L10 2 3 4.5V9.5C3 14.5 10 18 10 18z" stroke="#10B981" stroke-width="1.5"/></svg>
+              </div>
+              <div>
+                <h4>End-to-End Encryption</h4>
+                <p>Reports encrypted from device to server. No plaintext data in transit.</p>
+              </div>
+            </div>
+            <div class="privacy__feature" data-reveal>
+              <div class="privacy__feature-icon">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="8" r="3" stroke="#4F8CFF" stroke-width="1.5"/><path d="M3 18v-1a7 7 0 0114 0v1" stroke="#4F8CFF" stroke-width="1.5"/><path d="M14 5l3-3M17 5l-3-3" stroke="#EF4444" stroke-width="1.5" stroke-linecap="round"/></svg>
+              </div>
+              <div>
+                <h4>Auto Face Blurring</h4>
+                <p>AI automatically detects and blurs faces in all submitted evidence.</p>
+              </div>
+            </div>
+            <div class="privacy__feature" data-reveal>
+              <div class="privacy__feature-icon">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="3" y="8" width="14" height="10" rx="2" stroke="#A78BFA" stroke-width="1.5"/><path d="M6 8V5a4 4 0 018 0v3" stroke="#A78BFA" stroke-width="1.5"/><circle cx="10" cy="13" r="1.5" fill="#A78BFA"/></svg>
+              </div>
+              <div>
+                <h4>Zero-Knowledge Proofs</h4>
+                <p>Verify report authenticity without revealing reporter identity.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="privacy__visual" data-reveal>
+          <div class="privacy__shield">
+            <div class="privacy__shield-ring privacy__shield-ring--1"></div>
+            <div class="privacy__shield-ring privacy__shield-ring--2"></div>
+            <div class="privacy__shield-ring privacy__shield-ring--3"></div>
+            <div class="privacy__shield-core">
+              <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+                <path d="M24 4L6 12v10c0 13.2 7.68 25.52 18 28.56C34.32 47.52 42 35.2 42 22V12L24 4z" stroke="url(#shieldGrad)" stroke-width="2.5" fill="none"/>
+                <path d="M17 24l5 5 9-9" stroke="url(#shieldGrad)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <defs><linearGradient id="shieldGrad" x1="6" y1="4" x2="42" y2="48"><stop stop-color="#4F8CFF"/><stop offset="1" stop-color="#10B981"/></linearGradient></defs>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="wave-divider" aria-hidden="true">
+      <svg viewBox="0 0 1440 80" preserveAspectRatio="none">
+        <path d="M0,20 C480,80 960,0 1440,40 L1440,80 L0,80Z" fill="var(--bg-primary)"/>
+      </svg>
+    </div>
+  </section>
+
+  <!-- ═══════ REWARDS ═══════ -->
+  <section class="rewards" id="rewards">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Civic Rewards</span>
+        <h2 class="section-title">
+          Good Citizens<br/>Get <span class="text-gradient">Recognized</span>
+        </h2>
+        <p class="section-desc">
+          Every verified report earns civic karma. Climb the leaderboard and unlock 
+          rewards — because safer roads deserve recognition.
+        </p>
+      </div>
+
+      <div class="rewards__layout">
+        <div class="rewards__tiers">
+          <div class="rewards__tier rewards__tier--bronze" data-reveal>
+            <div class="rewards__tier-badge">
+              <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="14" stroke="#CD7F32" stroke-width="1.5"/><text x="16" y="20" text-anchor="middle" fill="#CD7F32" font-size="12" font-weight="700">B</text></svg>
+            </div>
+            <div class="rewards__tier-info">
+              <h4>Bronze Guardian</h4>
+              <p>5+ verified reports</p>
+            </div>
+            <span class="rewards__tier-karma">+50 Karma</span>
+          </div>
+          <div class="rewards__tier rewards__tier--silver" data-reveal>
+            <div class="rewards__tier-badge">
+              <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="14" stroke="#C0C0C0" stroke-width="1.5"/><text x="16" y="20" text-anchor="middle" fill="#C0C0C0" font-size="12" font-weight="700">S</text></svg>
+            </div>
+            <div class="rewards__tier-info">
+              <h4>Silver Sentinel</h4>
+              <p>25+ verified reports</p>
+            </div>
+            <span class="rewards__tier-karma">+200 Karma</span>
+          </div>
+          <div class="rewards__tier rewards__tier--gold" data-reveal>
+            <div class="rewards__tier-badge">
+              <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="14" stroke="#FFD700" stroke-width="1.5"/><text x="16" y="20" text-anchor="middle" fill="#FFD700" font-size="12" font-weight="700">G</text></svg>
+            </div>
+            <div class="rewards__tier-info">
+              <h4>Gold Champion</h4>
+              <p>100+ verified reports</p>
+            </div>
+            <span class="rewards__tier-karma">+1000 Karma</span>
+          </div>
+        </div>
+
+        <div class="rewards__perks" data-reveal>
+          <h3>Unlock Real Perks</h3>
+          <div class="rewards__perk-list">
+            <div class="rewards__perk">
+              <span class="rewards__perk-icon">🎫</span>
+              <span>Public transport credits</span>
+            </div>
+            <div class="rewards__perk">
+              <span class="rewards__perk-icon">📜</span>
+              <span>Digital civic certificates</span>
+            </div>
+            <div class="rewards__perk">
+              <span class="rewards__perk-icon">⭐</span>
+              <span>Priority parking passes</span>
+            </div>
+            <div class="rewards__perk">
+              <span class="rewards__perk-icon">🏆</span>
+              <span>City hall recognition</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="wave-divider wave-divider--flip" aria-hidden="true">
+      <svg viewBox="0 0 1440 80" preserveAspectRatio="none">
+        <path d="M0,40 C360,80 720,0 1080,50 C1260,65 1380,35 1440,20 L1440,80 L0,80Z" fill="var(--bg-dark)"/>
+      </svg>
+    </div>
+  </section>
+
+  <!-- ═══════ CTA ═══════ -->
+  <section class="cta">
+    <div class="cta__blobs" aria-hidden="true">
+      <div class="cta__blob cta__blob--1"></div>
+      <div class="cta__blob cta__blob--2"></div>
+    </div>
+    <div class="container">
+      <div class="cta__content" data-reveal>
+        <h2 class="cta__title">
+          Ready to Make Your<br/>City <span class="text-gradient-light">Safer</span>?
+        </h2>
+        <p class="cta__desc">
+          Join thousands of citizens building a safer, more accountable 
+          road ecosystem. Your first report takes under 60 seconds.
+        </p>
+        <div class="cta__buttons">
+          <a href="report.html" class="btn btn--white btn--glow">
+            <span>Start Reporting</span>
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M4 9h10M10 5l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <a href="authority.html" class="btn btn--ghost-light">
+            <span>Authority Portal</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════ FOOTER ═══════ -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer__top">
+        <div class="footer__brand">
+          <a href="#" class="nav__logo">
+            <span class="nav__logo-icon">
+              <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+                <circle cx="14" cy="14" r="12" stroke="url(#logoGrad2)" stroke-width="2.5"/>
+                <path d="M9 14.5L12.5 18L19 11" stroke="url(#logoGrad2)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <defs><linearGradient id="logoGrad2" x1="0" y1="0" x2="28" y2="28"><stop stop-color="#4F8CFF"/><stop offset="1" stop-color="#A78BFA"/></linearGradient></defs>
+              </svg>
+            </span>
+            <span class="nav__logo-text">SARAL</span>
+          </a>
+          <p class="footer__tagline">AI-Assisted Civic Road Safety Platform</p>
+        </div>
+        <div class="footer__links-group">
+          <div class="footer__col">
+            <h4>Platform</h4>
+            <a href="report.html">Report Violation</a>
+            <a href="dashboard.html">Dashboard</a>
+            <a href="authority.html">Authority Portal</a>
+          </div>
+          <div class="footer__col">
+            <h4>Resources</h4>
+            <a href="#">Documentation</a>
+            <a href="#">API Reference</a>
+            <a href="#">Community</a>
+          </div>
+          <div class="footer__col">
+            <h4>Legal</h4>
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms of Service</a>
+            <a href="#">Data Protection</a>
+          </div>
+        </div>
+      </div>
+      <div class="footer__bottom">
+        <p>&copy; 2026 SARAL. Built for safer roads.</p>
+        <div class="footer__social">
+          <a href="#" aria-label="Twitter">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <a href="#" aria-label="GitHub">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

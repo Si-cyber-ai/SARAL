@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Settings — SARAL</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/dashboard.css" />
+</head>
+<body class="dash-body">
+
+  <!-- ═══════ SIDEBAR ═══════ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar__top">
+      <a href="index.html" class="sidebar__logo">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+          <circle cx="14" cy="14" r="12" stroke="url(#sLogoG)" stroke-width="2.5"/>
+          <path d="M9 14.5L12.5 18L19 11" stroke="url(#sLogoG)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <defs><linearGradient id="sLogoG" x1="0" y1="0" x2="28" y2="28"><stop stop-color="#4F8CFF"/><stop offset="1" stop-color="#A78BFA"/></linearGradient></defs>
+        </svg>
+        <span>SARAL</span>
+      </a>
+    </div>
+
+    <nav class="sidebar__nav">
+      <a href="dashboard.html" class="sidebar__link">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="2" width="7" height="7" rx="2" stroke="currentColor" stroke-width="1.5"/><rect x="11" y="2" width="7" height="7" rx="2" stroke="currentColor" stroke-width="1.5"/><rect x="2" y="11" width="7" height="7" rx="2" stroke="currentColor" stroke-width="1.5"/><rect x="11" y="11" width="7" height="7" rx="2" stroke="currentColor" stroke-width="1.5"/></svg>
+        <span>Overview</span>
+      </a>
+      <a href="report.html" class="sidebar__link">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M17 10a7 7 0 11-14 0 7 7 0 0114 0z" stroke="currentColor" stroke-width="1.5"/><path d="M10 7v3l2 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <span>New Report</span>
+      </a>
+      <a href="my-reports.html" class="sidebar__link">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 6h12M4 10h12M4 14h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <span>My Reports</span>
+      </a>
+      <a href="rewards.html" class="sidebar__link">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 2l2.09 4.26L17 6.97l-3.5 3.42.83 4.84L10 13.14l-4.33 2.09.83-4.84L3 6.97l4.91-.71L10 2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+        <span>Rewards</span>
+      </a>
+      <a href="settings.html" class="sidebar__link sidebar__link--active">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="3" stroke="currentColor" stroke-width="1.5"/><path d="M10 2v2M10 16v2M2 10h2M16 10h2M4.93 4.93l1.41 1.41M13.66 13.66l1.41 1.41M15.07 4.93l-1.41 1.41M6.34 13.66l-1.41 1.41" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <span>Settings</span>
+      </a>
+    </nav>
+
+    <div class="sidebar__profile">
+      <div class="sidebar__profile-avatar">
+        <span>AK</span>
+      </div>
+      <div class="sidebar__profile-info">
+        <span class="sidebar__profile-name">Aarav Kumar</span>
+        <span class="sidebar__profile-badge">
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><circle cx="5" cy="5" r="4" fill="#FFD700"/></svg>
+          Gold Champion
+        </span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ═══════ MOBILE HEADER ═══════ -->
+  <header class="dash-header" id="dashHeader">
+    <button class="dash-header__toggle" id="sidebarToggle">
+      <span></span><span></span><span></span>
+    </button>
+    <a href="index.html" class="dash-header__logo">SARAL</a>
+    <a href="report.html" class="dash-header__action">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 3v12M3 9h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </a>
+  </header>
+
+  <!-- ═══════ MAIN CONTENT ═══════ -->
+  <main class="dash-main">
+    <!-- Page Header -->
+    <div class="dash-greeting" data-reveal>
+      <div>
+        <h1 class="dash-greeting__title"><span class="text-gradient">Settings</span></h1>
+        <p class="dash-greeting__sub">Manage your profile, privacy, and notification preferences</p>
+      </div>
+    </div>
+
+    <!-- Settings Tabs -->
+    <div class="settings-tabs" data-reveal>
+      <button class="settings-tabs__btn settings-tabs__btn--active" data-tab="profile">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="5" r="3" stroke="currentColor" stroke-width="1.3"/><path d="M2 14c0-3.31 2.69-5 6-5s6 1.69 6 5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+        Profile
+      </button>
+      <button class="settings-tabs__btn" data-tab="privacy">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1L2 4v4c0 3.87 2.56 6.66 6 8 3.44-1.34 6-4.13 6-8V4L8 1z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+        Privacy
+      </button>
+      <button class="settings-tabs__btn" data-tab="notifications">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6a4 4 0 118 0c0 4 2 5 2 5H2s2-1 2-5z" stroke="currentColor" stroke-width="1.3"/><path d="M6 13a2 2 0 004 0" stroke="currentColor" stroke-width="1.3"/></svg>
+        Notifications
+      </button>
+    </div>
+
+    <!-- Profile Tab -->
+    <div class="settings-panel settings-panel--active" id="panel-profile" data-reveal>
+      <div class="settings-card">
+        <div class="settings-card__header">
+          <div class="settings-card__avatar">
+            <span id="profileInitials">AK</span>
+          </div>
+          <div>
+            <h3 class="settings-card__name" id="profileDisplayName">Aarav Kumar</h3>
+            <span class="settings-card__tier" id="profileTier">Gold Champion</span>
+          </div>
+        </div>
+
+        <div class="settings-form">
+          <div class="settings-field">
+            <label class="settings-field__label" for="settingsName">Full Name</label>
+            <input class="settings-field__input" type="text" id="settingsName" placeholder="Your name" />
+          </div>
+          <div class="settings-field">
+            <label class="settings-field__label" for="settingsEmail">Email</label>
+            <input class="settings-field__input" type="email" id="settingsEmail" placeholder="you@email.com" />
+          </div>
+          <div class="settings-field">
+            <label class="settings-field__label" for="settingsCity">City</label>
+            <input class="settings-field__input" type="text" id="settingsCity" placeholder="Your city" />
+          </div>
+          <button class="btn btn--primary settings-form__save" id="saveProfile">
+            Save Changes
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Privacy Tab -->
+    <div class="settings-panel" id="panel-privacy">
+      <div class="settings-card">
+        <h3 class="settings-card__section-title">Privacy Preferences</h3>
+        <p class="settings-card__section-desc">Control how your data appears in reports and leaderboards</p>
+
+        <div class="settings-toggle-group">
+          <div class="settings-toggle-row">
+            <div class="settings-toggle-row__info">
+              <span class="settings-toggle-row__title">Blur License Plates</span>
+              <span class="settings-toggle-row__desc">Automatically blur license plates in uploaded evidence before submission</span>
+            </div>
+            <label class="settings-switch">
+              <input type="checkbox" id="toggleBlurPlates" />
+              <span class="settings-switch__slider"></span>
+            </label>
+          </div>
+          <div class="settings-toggle-row">
+            <div class="settings-toggle-row__info">
+              <span class="settings-toggle-row__title">Hide Identity on Leaderboard</span>
+              <span class="settings-toggle-row__desc">Display as "Anonymous Citizen" on public contribution rankings</span>
+            </div>
+            <label class="settings-switch">
+              <input type="checkbox" id="toggleHideIdentity" />
+              <span class="settings-switch__slider"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notifications Tab -->
+    <div class="settings-panel" id="panel-notifications">
+      <div class="settings-card">
+        <h3 class="settings-card__section-title">Notification Preferences</h3>
+        <p class="settings-card__section-desc">Choose which alerts and updates you want to receive</p>
+
+        <div class="settings-toggle-group">
+          <div class="settings-toggle-row">
+            <div class="settings-toggle-row__info">
+              <span class="settings-toggle-row__title">Email Notifications</span>
+              <span class="settings-toggle-row__desc">Get email updates when your report status changes</span>
+            </div>
+            <label class="settings-switch">
+              <input type="checkbox" id="toggleEmailNotifs" />
+              <span class="settings-switch__slider"></span>
+            </label>
+          </div>
+          <div class="settings-toggle-row">
+            <div class="settings-toggle-row__info">
+              <span class="settings-toggle-row__title">Reward Alerts</span>
+              <span class="settings-toggle-row__desc">Be notified when new rewards are available or points are earned</span>
+            </div>
+            <label class="settings-switch">
+              <input type="checkbox" id="toggleRewardAlerts" />
+              <span class="settings-switch__slider"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Danger Zone -->
+    <div class="settings-panel settings-panel--always" data-reveal>
+      <div class="settings-card settings-card--danger">
+        <h3 class="settings-card__section-title">Danger Zone</h3>
+        <p class="settings-card__section-desc">Reset all data back to defaults — this cannot be undone</p>
+        <button class="btn settings-form__reset" id="resetData">
+          Reset All Data
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/store.js"></script>
+  <script src="js/settings.js"></script>
+</body>
+</html>

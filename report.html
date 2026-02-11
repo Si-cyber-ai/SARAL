@@ -1,0 +1,1352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Reporting Studio — SARAL</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/dashboard.css" />
+  <style>
+    /* ═══════════════════════════════════════════════════
+       AI REPORTING STUDIO v2 — Interactive Evidence Processing
+       ═══════════════════════════════════════════════════ */
+
+    .studio-body {
+      font-family: var(--font-primary);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: #f7f8fc;
+      overflow-x: hidden;
+    }
+
+    /* ─── FLOATING TOP BAR ─── */
+    .studio-topbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 32px;
+      background: rgba(255,255,255,.85);
+      backdrop-filter: blur(24px) saturate(180%);
+      border-bottom: 1px solid rgba(0,0,0,.06);
+    }
+    .studio-topbar__logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: var(--font-display);
+      font-size: 18px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+    .studio-topbar__tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--blue-400);
+      background: rgba(79,140,255,.1);
+      border: 1px solid rgba(79,140,255,.15);
+      padding: 5px 14px;
+      border-radius: var(--radius-full);
+    }
+    .studio-topbar__back {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      color: #64748b;
+      padding: 8px 18px;
+      border-radius: var(--radius-full);
+      border: 1px solid rgba(0,0,0,.1);
+      transition: all var(--duration-fast);
+    }
+    .studio-topbar__back:hover {
+      color: #0f172a;
+      border-color: rgba(0,0,0,.2);
+      background: rgba(0,0,0,.03);
+    }
+
+    /* ─── MAIN SPLIT LAYOUT ─── */
+    .studio-main {
+      display: flex;
+      flex: 1;
+      min-height: 100vh;
+      padding-top: 58px;
+    }
+
+    /* ═══════ LEFT PANEL — EVIDENCE (60%) ═══════ */
+    .studio-left {
+      width: 60%;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 40px;
+      background: linear-gradient(160deg, #eef2ff 0%, #e8edff 40%, #f0f4ff 100%);
+      overflow: hidden;
+    }
+    .studio-left::before,
+    .studio-left::after {
+      content: '';
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      opacity: .2;
+    }
+    .studio-left::before {
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(79,140,255,.25), transparent 70%);
+      top: -80px; left: -100px;
+      animation: ambientDrift 20s ease-in-out infinite alternate;
+    }
+    .studio-left::after {
+      width: 350px; height: 350px;
+      background: radial-gradient(circle, rgba(167,139,250,.2), transparent 70%);
+      bottom: -50px; right: -60px;
+      animation: ambientDrift 25s ease-in-out infinite alternate-reverse;
+    }
+    @keyframes ambientDrift {
+      0% { transform: translate(0,0) scale(1); }
+      100% { transform: translate(40px, 30px) scale(1.15); }
+    }
+
+    .studio-left__grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(79,140,255,.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(79,140,255,.04) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+    }
+
+    /* ─── UPLOAD GLASS PANEL ─── */
+    .upload-glass {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 560px;
+      border-radius: 28px;
+      background: rgba(255,255,255,.85);
+      border: 1.5px solid rgba(0,0,0,.06);
+      backdrop-filter: blur(20px);
+      padding: 48px 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.5s var(--ease-out);
+      box-shadow: 0 4px 24px rgba(0,0,0,.04);
+    }
+    .upload-glass:hover {
+      background: #fff;
+      border-color: rgba(79,140,255,.25);
+      box-shadow: 0 8px 40px rgba(79,140,255,.1);
+    }
+    .upload-glass__border {
+      position: absolute;
+      inset: -2px;
+      border-radius: 30px;
+      border: 2.5px dashed rgba(79,140,255,.25);
+      pointer-events: none;
+      animation: borderRotate 30s linear infinite;
+    }
+    @keyframes borderRotate {
+      0% { border-color: rgba(79,140,255,.25); }
+      33% { border-color: rgba(167,139,250,.25); }
+      66% { border-color: rgba(52,211,153,.2); }
+      100% { border-color: rgba(79,140,255,.25); }
+    }
+    .upload-glass__icon {
+      width: 88px; height: 88px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(135deg, rgba(79,140,255,.15), rgba(167,139,250,.15));
+      border: 1.5px solid rgba(79,140,255,.2);
+      margin-bottom: 28px;
+      position: relative;
+      color: var(--blue-400);
+    }
+    .upload-glass__icon::after {
+      content: '';
+      position: absolute;
+      inset: -12px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(79,140,255,.15), transparent 70%);
+      animation: iconGlow 3s ease-in-out infinite alternate;
+    }
+    @keyframes iconGlow {
+      0% { opacity: .5; transform: scale(.95); }
+      100% { opacity: 1; transform: scale(1.1); }
+    }
+    .upload-glass__title {
+      font-family: var(--font-display);
+      font-size: 26px; font-weight: 700;
+      color: #0f172a; letter-spacing: -0.02em;
+      margin-bottom: 12px;
+    }
+    .upload-glass__desc {
+      font-size: 15px; color: #64748b;
+      line-height: 1.7; max-width: 380px; margin-bottom: 32px;
+    }
+    .upload-glass__desc strong { color: #334155; font-weight: 500; }
+    .upload-glass__formats {
+      display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;
+    }
+    .upload-glass__format {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: 11px; font-weight: 600;
+      letter-spacing: 0.04em; text-transform: uppercase;
+      color: #64748b;
+      background: rgba(79,140,255,.06);
+      border: 1px solid rgba(79,140,255,.1);
+      padding: 5px 12px; border-radius: var(--radius-full);
+    }
+    .upload-glass.is-dragover {
+      border-color: rgba(79,140,255,.5);
+      background: rgba(79,140,255,.08);
+      box-shadow: 0 0 80px rgba(79,140,255,.15);
+      transform: scale(1.01);
+    }
+    .upload-glass.is-hidden { display: none; }
+
+    /* ═══════ EVIDENCE PREVIEW — CARD STACK + CV OVERLAY ═══════ */
+    .evidence-stage {
+      display: none;
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 580px;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+    }
+    .evidence-stage.is-active { display: flex; }
+
+    /* Stacked card container */
+    .card-stack {
+      position: relative;
+      width: 100%;
+      height: 400px;
+      perspective: 1200px;
+    }
+    .card-stack__item {
+      position: absolute;
+      inset: 0;
+      border-radius: 24px;
+      overflow: hidden;
+      border: 1.5px solid rgba(0,0,0,.08);
+      box-shadow: 0 20px 60px rgba(0,0,0,.1), 0 0 30px rgba(79,140,255,.04);
+      transition: all 0.6s cubic-bezier(0.16,1,0.3,1);
+      background: #fff;
+    }
+    .card-stack__item:nth-child(1) {
+      z-index: 3; transform: translateY(0) scale(1);
+    }
+    .card-stack__item:nth-child(2) {
+      z-index: 2; transform: translateY(14px) scale(.96);
+      opacity: .6; filter: blur(1px);
+    }
+    .card-stack__item:nth-child(3) {
+      z-index: 1; transform: translateY(28px) scale(.92);
+      opacity: .3; filter: blur(2px);
+    }
+    .card-stack__item img {
+      width: 100%; height: 100%;
+      object-fit: cover; display: block;
+    }
+    /* Floating animation for the stack */
+    .card-stack {
+      animation: stackFloat 5s ease-in-out infinite;
+    }
+    @keyframes stackFloat {
+      0%,100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    /* ─── CV OVERLAY — Bounding Boxes, Scan, Grid ─── */
+    .cv-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 10;
+      pointer-events: none;
+      border-radius: 24px;
+      overflow: hidden;
+    }
+
+    /* Fine grid */
+    .cv-overlay__grid {
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(79,140,255,.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(79,140,255,.06) 1px, transparent 1px);
+      background-size: 32px 32px;
+      opacity: 0;
+      animation: gridFadeIn .8s .5s forwards;
+    }
+    @keyframes gridFadeIn { to { opacity: 1; } }
+
+    /* Moving scan line */
+    .cv-overlay__scanline {
+      position: absolute; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, rgba(79,140,255,.8), transparent);
+      box-shadow: 0 0 30px 8px rgba(79,140,255,.2);
+      animation: cvScan 3s ease-in-out infinite;
+    }
+    @keyframes cvScan {
+      0% { top: -2px; opacity: 0; }
+      5% { opacity: 1; }
+      95% { opacity: 1; }
+      100% { top: 100%; opacity: 0; }
+    }
+
+    /* Bounding boxes */
+    .cv-bbox {
+      position: absolute;
+      border: 2px solid rgba(79,140,255,.6);
+      border-radius: 6px;
+      opacity: 0;
+      animation: bboxAppear .4s forwards;
+    }
+    @keyframes bboxAppear {
+      0% { opacity: 0; transform: scale(1.1); }
+      50% { opacity: 1; transform: scale(1); }
+      100% { opacity: .7; transform: scale(1); }
+    }
+    .cv-bbox::before {
+      content: attr(data-label);
+      position: absolute;
+      top: -22px; left: -2px;
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 0.04em; text-transform: uppercase;
+      color: #fff;
+      background: rgba(79,140,255,.8);
+      padding: 2px 8px;
+      border-radius: 4px 4px 4px 0;
+      white-space: nowrap;
+    }
+    /* License plate bbox — amber */
+    .cv-bbox--plate {
+      border-color: rgba(251,191,36,.7);
+    }
+    .cv-bbox--plate::before {
+      background: rgba(245,158,11,.85);
+    }
+    /* Face bbox — green with blur tag */
+    .cv-bbox--face {
+      border-color: rgba(52,211,153,.6);
+      background: rgba(52,211,153,.08);
+      backdrop-filter: blur(8px);
+    }
+    .cv-bbox--face::before {
+      background: rgba(16,185,129,.85);
+    }
+
+    /* Floating detection badges on preview */
+    .cv-badge {
+      position: absolute;
+      display: flex; align-items: center; gap: 6px;
+      font-size: 11px; font-weight: 600;
+      color: #fff;
+      background: rgba(8,12,24,.75);
+      backdrop-filter: blur(12px);
+      padding: 6px 14px;
+      border-radius: var(--radius-full);
+      border: 1px solid rgba(255,255,255,.1);
+      opacity: 0;
+      transform: translateY(8px);
+      transition: all .5s var(--ease-out);
+    }
+    .cv-badge.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .cv-badge__dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+    }
+    .cv-badge--scanning { bottom: 16px; left: 16px; }
+    .cv-badge--scanning .cv-badge__dot {
+      background: var(--blue-400);
+      animation: dotPulse 1.5s infinite;
+    }
+    .cv-badge--blurred { bottom: 16px; right: 16px; }
+    .cv-badge--blurred .cv-badge__dot { background: var(--green-400); }
+
+    @keyframes dotPulse {
+      0%,100% { opacity: 1; box-shadow: 0 0 6px rgba(79,140,255,.5); }
+      50% { opacity: .4; box-shadow: none; }
+    }
+
+    /* Change file button */
+    .evidence-stage__change {
+      position: absolute;
+      top: 16px; right: 16px;
+      z-index: 20;
+      font-size: 12px; font-weight: 600;
+      color: rgba(255,255,255,.7);
+      background: rgba(8,12,24,.6);
+      backdrop-filter: blur(12px);
+      padding: 8px 16px;
+      border-radius: var(--radius-full);
+      border: 1px solid rgba(255,255,255,.1);
+      cursor: pointer;
+      transition: all var(--duration-fast);
+    }
+    .evidence-stage__change:hover {
+      color: #fff; border-color: rgba(255,255,255,.25);
+    }
+
+    /* ─── SMART FEEDBACK BADGES ─── */
+    .smart-badges {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .smart-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 9px 18px;
+      border-radius: var(--radius-full);
+      background: #fff;
+      border: 1px solid rgba(0,0,0,.06);
+      color: #94a3b8;
+      box-shadow: 0 2px 8px rgba(0,0,0,.04);
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all .5s var(--ease-out);
+    }
+    .smart-badge.is-active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .smart-badge--privacy.is-active {
+      border-color: rgba(16,185,129,.3);
+      background: rgba(16,185,129,.08);
+      color: var(--green-400);
+    }
+    .smart-badge--confidence.is-active {
+      border-color: rgba(79,140,255,.3);
+      background: rgba(79,140,255,.08);
+      color: var(--blue-300);
+    }
+    .smart-badge--location.is-active {
+      border-color: rgba(167,139,250,.3);
+      background: rgba(167,139,250,.08);
+      color: var(--violet-400);
+    }
+    .smart-badge__icon {
+      width: 16px; height: 16px;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* ═══════ RIGHT PANEL (40%) ═══════ */
+    .studio-right {
+      width: 40%;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      padding: 48px 32px;
+      background: linear-gradient(175deg, #f8f9fc 0%, #ffffff 100%);
+      overflow-y: auto;
+      gap: 0;
+    }
+    .studio-right::before {
+      content: '';
+      position: absolute;
+      width: 300px; height: 300px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(167,139,250,.06), transparent 70%);
+      top: 10%; right: -80px;
+      filter: blur(60px);
+      pointer-events: none;
+    }
+
+    /* ─── AI STATUS PANEL (top of right side) ─── */
+    .ai-status {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 420px;
+      margin: 0 auto 24px;
+      border-radius: 24px;
+      background: #fff;
+      border: 1px solid rgba(0,0,0,.06);
+      box-shadow: 0 4px 20px rgba(0,0,0,.04);
+      padding: 28px 24px;
+      display: none;
+    }
+    .ai-status.is-active { display: block; }
+
+    .ai-status__header {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 20px;
+    }
+    .ai-status__orb {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgba(79,140,255,.2), rgba(167,139,250,.2));
+      border: 1.5px solid rgba(79,140,255,.25);
+      display: flex; align-items: center; justify-content: center;
+      position: relative;
+      flex-shrink: 0;
+    }
+    .ai-status__orb-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: var(--blue-400);
+      box-shadow: 0 0 12px rgba(79,140,255,.5);
+      animation: coreBreath 2s ease-in-out infinite;
+    }
+    .ai-status.is-complete .ai-status__orb {
+      background: linear-gradient(135deg, rgba(16,185,129,.2), rgba(52,211,153,.2));
+      border-color: rgba(16,185,129,.3);
+    }
+    .ai-status.is-complete .ai-status__orb-dot {
+      background: var(--green-400);
+      box-shadow: 0 0 12px rgba(16,185,129,.5);
+      animation: none;
+    }
+    @keyframes coreBreath {
+      0%,100% { transform: scale(1); }
+      50% { transform: scale(1.25); }
+    }
+    .ai-status__title {
+      font-family: var(--font-display);
+      font-size: 15px; font-weight: 700;
+      color: #0f172a; letter-spacing: -0.01em;
+    }
+    .ai-status__subtitle {
+      font-size: 12px; color: #94a3b8;
+      margin-top: 2px;
+    }
+
+    /* Checklist items */
+    .ai-checklist {
+      display: flex; flex-direction: column; gap: 0;
+    }
+    .ai-check {
+      display: flex; align-items: center; gap: 14px;
+      padding: 11px 0;
+      border-bottom: 1px solid rgba(0,0,0,.04);
+      transition: all .5s var(--ease-out);
+    }
+    .ai-check:last-child { border-bottom: none; }
+
+    .ai-check__icon {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      border: 1.5px solid rgba(0,0,0,.08);
+      background: rgba(0,0,0,.02);
+      color: #cbd5e1;
+      flex-shrink: 0;
+      transition: all .5s var(--ease-out);
+    }
+    .ai-check__text {
+      font-size: 13px; font-weight: 500;
+      color: #94a3b8;
+      transition: all .5s var(--ease-out);
+    }
+
+    /* Loading state — spinner */
+    .ai-check.is-loading .ai-check__icon {
+      border-color: var(--blue-400);
+      background: rgba(79,140,255,.1);
+      color: var(--blue-400);
+      animation: checkSpin 1s linear infinite;
+    }
+    .ai-check.is-loading .ai-check__text {
+      color: #0f172a;
+    }
+    @keyframes checkSpin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Done state — checkmark */
+    .ai-check.is-done .ai-check__icon {
+      border-color: var(--green-400);
+      background: rgba(16,185,129,.12);
+      color: var(--green-400);
+      animation: none;
+    }
+    .ai-check.is-done .ai-check__text {
+      color: #64748b;
+    }
+
+    /* Complete message */
+    .ai-status__complete {
+      display: none;
+      margin-top: 16px;
+      padding: 14px 18px;
+      border-radius: 16px;
+      background: rgba(16,185,129,.06);
+      border: 1px solid rgba(16,185,129,.15);
+      text-align: center;
+    }
+    .ai-status.is-complete .ai-status__complete { display: block; }
+    .ai-status__complete-text {
+      font-family: var(--font-display);
+      font-size: 13px; font-weight: 600;
+      color: var(--green-400);
+      letter-spacing: -0.01em;
+    }
+
+    /* ─── FORM GLASS CARD ─── */
+    .details-glass {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 420px;
+      margin: 0 auto;
+      border-radius: 28px;
+      background: #fff;
+      border: 1px solid rgba(0,0,0,.06);
+      box-shadow: 0 4px 24px rgba(0,0,0,.04);
+      padding: 36px 28px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .details-glass__header { margin-bottom: 28px; }
+    .details-glass__label {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 11px; font-weight: 600;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      color: var(--violet-400); margin-bottom: 10px;
+    }
+    .details-glass__label svg { opacity: .7; }
+    .details-glass__title {
+      font-family: var(--font-display);
+      font-size: 20px; font-weight: 700;
+      color: #0f172a; letter-spacing: -0.02em;
+    }
+
+    /* ─── FORM FIELDS ─── */
+    .studio-field { margin-bottom: 22px; }
+    .studio-field__label {
+      display: block; font-size: 11px; font-weight: 600;
+      color: #64748b;
+      text-transform: uppercase; letter-spacing: 0.06em;
+      margin-bottom: 10px;
+    }
+
+    .violation-pills { display: flex; flex-wrap: wrap; gap: 7px; }
+    .violation-pill {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 9px 15px;
+      border-radius: var(--radius-full);
+      border: 1.5px solid rgba(0,0,0,.08);
+      background: rgba(0,0,0,.02);
+      color: #475569;
+      font-size: 12px; font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s var(--ease-out);
+      user-select: none;
+    }
+    .violation-pill:hover {
+      border-color: rgba(79,140,255,.25);
+      color: #1e40af;
+      background: rgba(79,140,255,.06);
+    }
+    .violation-pill.is-active {
+      border-color: rgba(79,140,255,.4);
+      background: rgba(79,140,255,.1);
+      color: #2563eb;
+      box-shadow: 0 0 20px rgba(79,140,255,.08);
+    }
+    .violation-pill__icon { font-size: 14px; line-height: 1; }
+
+    .studio-input-wrap {
+      display: flex; gap: 10px; align-items: center;
+    }
+    .studio-input {
+      flex: 1; padding: 13px 16px;
+      border-radius: 14px;
+      border: 1.5px solid rgba(0,0,0,.1);
+      background: #fff;
+      color: #0f172a;
+      font-family: var(--font-primary); font-size: 13px;
+      outline: none;
+      transition: all 0.3s var(--ease-out);
+    }
+    .studio-input::placeholder { color: #94a3b8; }
+    .studio-input:focus {
+      border-color: rgba(79,140,255,.4);
+      background: #fff;
+      box-shadow: 0 0 20px rgba(79,140,255,.1);
+    }
+
+    .gps-glow-btn {
+      width: 46px; height: 46px;
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(135deg, rgba(52,211,153,.12), rgba(79,140,255,.12));
+      border: 1.5px solid rgba(52,211,153,.2);
+      color: var(--green-400);
+      flex-shrink: 0; cursor: pointer;
+      transition: all 0.3s var(--ease-out);
+      position: relative;
+    }
+    .gps-glow-btn::after {
+      content: '';
+      position: absolute; inset: -4px;
+      border-radius: 18px;
+      background: radial-gradient(circle, rgba(52,211,153,.15), transparent 70%);
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .gps-glow-btn:hover {
+      background: linear-gradient(135deg, rgba(52,211,153,.2), rgba(79,140,255,.2));
+      border-color: rgba(52,211,153,.35);
+      box-shadow: 0 0 30px rgba(52,211,153,.15);
+    }
+    .gps-glow-btn:hover::after { opacity: 1; }
+    .gps-glow-btn.is-detecting { animation: gpsPing 1s ease-in-out infinite; }
+    @keyframes gpsPing {
+      0%,100% { box-shadow: 0 0 10px rgba(52,211,153,.15); }
+      50% { box-shadow: 0 0 30px rgba(52,211,153,.3); }
+    }
+
+    .studio-textarea {
+      width: 100%; min-height: 90px;
+      padding: 14px 16px; border-radius: 16px;
+      border: 1.5px solid rgba(0,0,0,.1);
+      background: #fff;
+      color: #0f172a;
+      font-family: var(--font-primary);
+      font-size: 13px; line-height: 1.7;
+      outline: none; resize: vertical;
+      transition: all 0.3s var(--ease-out);
+    }
+    .studio-textarea::placeholder { color: #94a3b8; }
+    .studio-textarea:focus {
+      border-color: rgba(79,140,255,.4);
+      background: #fff;
+      box-shadow: 0 0 20px rgba(79,140,255,.1);
+    }
+
+    /* ─── DARK SUBMIT BUTTON ─── */
+    .studio-submit {
+      width: 100%;
+      padding: 16px 28px;
+      border-radius: 18px;
+      border: none;
+      background: #0f172a;
+      color: #fff;
+      font-family: var(--font-display);
+      font-size: 15px; font-weight: 700;
+      letter-spacing: -0.01em;
+      cursor: pointer;
+      display: flex; align-items: center;
+      justify-content: center; gap: 10px;
+      position: relative; overflow: hidden;
+      transition: all 0.4s var(--ease-out);
+      box-shadow: 0 8px 30px rgba(15,23,42,.15);
+      margin-top: auto;
+    }
+    .studio-submit::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, #1e293b, #334155);
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+    .studio-submit:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 40px rgba(15,23,42,.25);
+    }
+    .studio-submit:hover:not(:disabled)::before { opacity: 1; }
+    .studio-submit span,
+    .studio-submit svg { position: relative; z-index: 1; }
+
+    /* Disabled / processing state */
+    .studio-submit:disabled {
+      background: rgba(0,0,0,.06);
+      color: #94a3b8;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+    .studio-submit:disabled .submit-spinner {
+      display: inline-block;
+    }
+    .submit-spinner {
+      display: none;
+      width: 16px; height: 16px;
+      border: 2px solid rgba(0,0,0,.08);
+      border-top-color: #64748b;
+      border-radius: 50%;
+      animation: checkSpin .8s linear infinite;
+      position: relative; z-index: 1;
+    }
+
+    /* Glow ripple when enabled after AI */
+    .studio-submit.is-ready {
+      animation: submitGlow 2s ease-in-out infinite;
+    }
+    @keyframes submitGlow {
+      0%,100% { box-shadow: 0 8px 30px rgba(15,23,42,.15), 0 0 0 0 rgba(79,140,255,.08); }
+      50% { box-shadow: 0 8px 30px rgba(15,23,42,.2), 0 0 0 8px rgba(79,140,255,.05); }
+    }
+
+    .studio-submit__note {
+      text-align: center;
+      margin-top: 14px;
+      font-size: 11px;
+      color: #94a3b8;
+      line-height: 1.6;
+    }
+    .studio-submit__note svg {
+      vertical-align: -2px; margin-right: 4px; opacity: .5;
+    }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 1024px) {
+      .studio-main { flex-direction: column; }
+      .studio-left, .studio-right { width: 100%; }
+      .studio-left { min-height: 55vh; padding: 40px 24px; }
+      .studio-right { padding: 40px 24px; }
+    }
+    @media (max-width: 640px) {
+      .studio-topbar { padding: 12px 16px; }
+      .studio-topbar__tag { display: none; }
+      .studio-left { padding: 32px 16px; min-height: 50vh; }
+      .studio-right { padding: 24px 16px; }
+      .upload-glass { padding: 32px 20px; border-radius: 22px; }
+      .upload-glass__icon { width: 68px; height: 68px; }
+      .upload-glass__title { font-size: 22px; }
+      .card-stack { height: 280px; }
+      .details-glass { padding: 24px 18px; border-radius: 22px; }
+      .violation-pill { padding: 7px 12px; font-size: 11px; }
+      .studio-submit { padding: 14px 20px; font-size: 14px; border-radius: 14px; }
+      .smart-badges { gap: 6px; }
+      .smart-badge { font-size: 11px; padding: 7px 12px; }
+    }
+  </style>
+</head>
+<body class="studio-body">
+
+  <!-- ═══ FLOATING TOP BAR ═══ -->
+  <div class="studio-topbar">
+    <div style="display:flex;align-items:center;gap:16px;">
+      <a href="index.html" class="studio-topbar__logo">
+        <svg width="24" height="24" viewBox="0 0 28 28" fill="none">
+          <circle cx="14" cy="14" r="12" stroke="url(#stLogoG)" stroke-width="2.5"/>
+          <path d="M9 14.5L12.5 18L19 11" stroke="url(#stLogoG)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <defs><linearGradient id="stLogoG" x1="0" y1="0" x2="28" y2="28"><stop stop-color="#4F8CFF"/><stop offset="1" stop-color="#A78BFA"/></linearGradient></defs>
+        </svg>
+        SARAL
+      </a>
+      <span class="studio-topbar__tag">
+        <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor"><circle cx="5" cy="5" r="3"/></svg>
+        AI Reporting Studio
+      </span>
+    </div>
+    <a href="dashboard.html" class="studio-topbar__back">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M10 7H4M7 4L4 7l3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Back to Dashboard
+    </a>
+  </div>
+
+  <!-- ═══ MAIN SPLIT LAYOUT ═══ -->
+  <div class="studio-main">
+
+    <!-- ─── LEFT: EVIDENCE ZONE (60%) ─── -->
+    <div class="studio-left">
+      <div class="studio-left__grid"></div>
+
+      <!-- Upload Glass Panel (before upload) -->
+      <div class="upload-glass" id="uploadZone">
+        <div class="upload-glass__border"></div>
+        <div class="upload-glass__icon">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" style="position:relative;z-index:1">
+            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <polyline points="17 8 12 3 7 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <line x1="12" y1="3" x2="12" y2="15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h2 class="upload-glass__title">Upload Evidence</h2>
+        <p class="upload-glass__desc">
+          Photos or videos up to <strong>50 MB</strong>. Faces are <strong>automatically blurred</strong> for privacy.
+        </p>
+        <div class="upload-glass__formats">
+          <span class="upload-glass__format">JPG</span>
+          <span class="upload-glass__format">PNG</span>
+          <span class="upload-glass__format">MP4</span>
+          <span class="upload-glass__format">HEIC</span>
+          <span class="upload-glass__format">WEBM</span>
+        </div>
+        <input type="file" id="fileInput" hidden accept="image/*,video/*" multiple />
+      </div>
+
+      <!-- Evidence Stage (after upload — card stack + CV overlay + badges) -->
+      <div class="evidence-stage" id="evidenceStage">
+        <!-- Card stack -->
+        <div class="card-stack" id="cardStack">
+          <!-- Primary card (front) -->
+          <div class="card-stack__item" id="card1">
+            <img id="previewImg1" src="" alt="Evidence" />
+            <!-- CV Overlay -->
+            <div class="cv-overlay" id="cvOverlay">
+              <div class="cv-overlay__grid"></div>
+              <div class="cv-overlay__scanline"></div>
+              <!-- Bounding boxes injected by JS -->
+            </div>
+            <!-- CV Badges on image -->
+            <div class="cv-badge cv-badge--scanning" id="badgeScanning">
+              <div class="cv-badge__dot"></div>
+              AI Analyzing Evidence...
+            </div>
+            <div class="cv-badge cv-badge--blurred" id="badgeBlurred">
+              <div class="cv-badge__dot"></div>
+              Faces Blurred
+            </div>
+          </div>
+          <!-- Shadow cards behind -->
+          <div class="card-stack__item" id="card2">
+            <img id="previewImg2" src="" alt="" />
+          </div>
+          <div class="card-stack__item" id="card3">
+            <img id="previewImg3" src="" alt="" />
+          </div>
+        </div>
+
+        <!-- Change file -->
+        <button class="evidence-stage__change" id="changeFileBtn">Change File</button>
+
+        <!-- Smart Feedback Badges -->
+        <div class="smart-badges">
+          <div class="smart-badge smart-badge--privacy" id="sbPrivacy">
+            <span class="smart-badge__icon">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1.5L3 3.5v3c0 3.3 1.7 6.3 4 7 2.3-.7 4-3.7 4-7v-3L7 1.5z" stroke="currentColor" stroke-width="1.2"/><path d="M5 7l1.5 1.5L9 6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            Privacy Protected
+          </div>
+          <div class="smart-badge smart-badge--confidence" id="sbConfidence">
+            <span class="smart-badge__icon">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1l1.76 3.57L13 5.24l-3 2.92.71 4.14L7 10.38 3.29 12.3 4 8.16 1 5.24l4.24-.67L7 1z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>
+            </span>
+            High Detection Confidence
+          </div>
+          <div class="smart-badge smart-badge--location" id="sbLocation">
+            <span class="smart-badge__icon">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="6" r="2" stroke="currentColor" stroke-width="1.2"/><path d="M7 13S2.5 8.5 2.5 6a4.5 4.5 0 019 0C11.5 8.5 7 13 7 13z" stroke="currentColor" stroke-width="1.2"/></svg>
+            </span>
+            Location Verified
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── RIGHT: STATUS + FORM (40%) ─── -->
+    <div class="studio-right">
+
+      <!-- AI Processing Status Panel -->
+      <div class="ai-status" id="aiStatus">
+        <div class="ai-status__header">
+          <div class="ai-status__orb">
+            <div class="ai-status__orb-dot"></div>
+          </div>
+          <div>
+            <div class="ai-status__title" id="aiStatusTitle">AI Analysis in Progress</div>
+            <div class="ai-status__subtitle" id="aiStatusSub">Processing your evidence...</div>
+          </div>
+        </div>
+        <div class="ai-checklist" id="aiChecklist">
+          <div class="ai-check" data-step="0">
+            <div class="ai-check__icon">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="4" stroke="currentColor" stroke-width="1.2"/></svg>
+            </div>
+            <span class="ai-check__text">Detecting violation type</span>
+          </div>
+          <div class="ai-check" data-step="1">
+            <div class="ai-check__icon">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="2" y="3" width="8" height="5" rx="1" stroke="currentColor" stroke-width="1.2"/><path d="M4 6h4" stroke="currentColor" stroke-width="1"/></svg>
+            </div>
+            <span class="ai-check__text">Reading number plate</span>
+          </div>
+          <div class="ai-check" data-step="2">
+            <div class="ai-check__icon">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="5" r="2" stroke="currentColor" stroke-width="1.2"/><path d="M2 10c0-2.2 1.8-4 4-4s4 1.8 4 4" stroke="currentColor" stroke-width="1.2"/></svg>
+            </div>
+            <span class="ai-check__text">Blurring faces</span>
+          </div>
+          <div class="ai-check" data-step="3">
+            <div class="ai-check__icon">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="5.5" r="2" stroke="currentColor" stroke-width="1.2"/><path d="M6 1v1M6 10v1M1 5.5h1M10 5.5h1" stroke="currentColor" stroke-width="1" stroke-linecap="round"/></svg>
+            </div>
+            <span class="ai-check__text">Verifying location metadata</span>
+          </div>
+          <div class="ai-check" data-step="4">
+            <div class="ai-check__icon">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1L3 3v3c0 2.7 1.3 5.2 3 5.8 1.7-.6 3-3.1 3-5.8V3L6 1z" stroke="currentColor" stroke-width="1.2"/></svg>
+            </div>
+            <span class="ai-check__text">Preparing for authority review</span>
+          </div>
+        </div>
+        <div class="ai-status__complete">
+          <div class="ai-status__complete-text">AI Analysis Complete — Ready for Authority Review</div>
+        </div>
+      </div>
+
+      <!-- Form Glass Card -->
+      <div class="details-glass">
+        <div class="details-glass__header">
+          <div class="details-glass__label">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1v10M1 6h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            Report Details
+          </div>
+          <h2 class="details-glass__title">Describe the Violation</h2>
+        </div>
+
+        <form id="reportForm">
+          <!-- Violation Type Pills -->
+          <div class="studio-field">
+            <label class="studio-field__label">Violation Type</label>
+            <div class="violation-pills" id="violationPills">
+              <div class="violation-pill" data-value="signal">
+                <span class="violation-pill__icon">🚦</span> Signal Jumping
+              </div>
+              <div class="violation-pill" data-value="speeding">
+                <span class="violation-pill__icon">💨</span> Over Speeding
+              </div>
+              <div class="violation-pill" data-value="wrongway">
+                <span class="violation-pill__icon">🚫</span> Wrong Way
+              </div>
+              <div class="violation-pill" data-value="parking">
+                <span class="violation-pill__icon">🅿️</span> Illegal Parking
+              </div>
+              <div class="violation-pill" data-value="helmet">
+                <span class="violation-pill__icon">⛑️</span> No Helmet
+              </div>
+              <div class="violation-pill" data-value="seatbelt">
+                <span class="violation-pill__icon">🔗</span> No Seatbelt
+              </div>
+              <div class="violation-pill" data-value="phone">
+                <span class="violation-pill__icon">📱</span> Phone Use
+              </div>
+              <div class="violation-pill" data-value="other">
+                <span class="violation-pill__icon">⚠️</span> Other
+              </div>
+            </div>
+            <input type="hidden" id="violationType" name="violationType" />
+          </div>
+
+          <!-- Location -->
+          <div class="studio-field">
+            <label class="studio-field__label">Location</label>
+            <div class="studio-input-wrap">
+              <input type="text" class="studio-input" placeholder="Enter location or detect via GPS" id="locationInput" />
+              <button type="button" class="gps-glow-btn" id="gpsBtn" title="Detect GPS Location">
+                <svg width="18" height="18" viewBox="0 0 20 20" fill="none" style="position:relative;z-index:1">
+                  <circle cx="10" cy="10" r="3" stroke="currentColor" stroke-width="1.5"/>
+                  <path d="M10 2v3M10 15v3M2 10h3M15 10h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Description -->
+          <div class="studio-field">
+            <label class="studio-field__label">Description <span style="opacity:.5;text-transform:none;letter-spacing:0">(optional)</span></label>
+            <textarea class="studio-textarea" placeholder="What happened? Where and when did you observe this?"></textarea>
+          </div>
+
+          <!-- Submit -->
+          <div class="studio-field" style="margin-bottom:0;margin-top:auto;">
+            <button type="submit" class="studio-submit" id="submitBtn" disabled>
+              <div class="submit-spinner"></div>
+              <span id="submitText">Upload evidence to begin</span>
+              <svg id="submitArrow" width="18" height="18" viewBox="0 0 18 18" fill="none" style="display:none"><path d="M3.75 9h10.5M10.5 5.25L14.25 9l-3.75 3.75" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <p class="studio-submit__note">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1L2 3.5v3C2 9.8 3.7 13 6 13.8c2.3-.8 4-4 4-7.3v-3L6 1z" stroke="currentColor" stroke-width="1"/></svg>
+              Your identity is protected. Authorities review every report.
+            </p>
+          </div>
+        </form>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══ JAVASCRIPT ═══ -->
+  <script>
+    (function () {
+      'use strict';
+
+      /* ─── DOM REFS ─── */
+      const uploadZone = document.getElementById('uploadZone');
+      const fileInput = document.getElementById('fileInput');
+      const evidenceStage = document.getElementById('evidenceStage');
+      const cardStack = document.getElementById('cardStack');
+      const previewImg1 = document.getElementById('previewImg1');
+      const previewImg2 = document.getElementById('previewImg2');
+      const previewImg3 = document.getElementById('previewImg3');
+      const cvOverlay = document.getElementById('cvOverlay');
+      const changeBtn = document.getElementById('changeFileBtn');
+      const aiStatus = document.getElementById('aiStatus');
+      const submitBtn = document.getElementById('submitBtn');
+      const submitText = document.getElementById('submitText');
+      const submitArrow = document.getElementById('submitArrow');
+      const badgeScanning = document.getElementById('badgeScanning');
+      const badgeBlurred = document.getElementById('badgeBlurred');
+
+      let aiComplete = false;
+
+      /* ─── SHOW EVIDENCE + START AI SEQUENCE ─── */
+      function showEvidence(file) {
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = e => {
+          const src = e.target.result;
+          previewImg1.src = src;
+          previewImg2.src = src;
+          previewImg3.src = src;
+
+          uploadZone.classList.add('is-hidden');
+          evidenceStage.classList.add('is-active');
+
+          // Start AI scanning sequence
+          submitBtn.disabled = true;
+          submitText.textContent = 'Processing Evidence...';
+          submitArrow.style.display = 'none';
+          startAIScan();
+        };
+        reader.readAsDataURL(file);
+      }
+
+      function resetUpload() {
+        uploadZone.classList.remove('is-hidden');
+        evidenceStage.classList.remove('is-active');
+        previewImg1.src = '';
+        previewImg2.src = '';
+        previewImg3.src = '';
+        fileInput.value = '';
+        aiComplete = false;
+
+        // Reset AI status
+        aiStatus.classList.remove('is-active', 'is-complete');
+        document.querySelectorAll('.ai-check').forEach(c => {
+          c.classList.remove('is-loading', 'is-done');
+          c.querySelector('.ai-check__icon').innerHTML = c.querySelector('.ai-check__icon').dataset.original || c.querySelector('.ai-check__icon').innerHTML;
+        });
+        document.getElementById('aiStatusTitle').textContent = 'AI Analysis in Progress';
+        document.getElementById('aiStatusSub').textContent = 'Processing your evidence...';
+
+        // Reset badges
+        badgeScanning.classList.remove('is-visible');
+        badgeBlurred.classList.remove('is-visible');
+        document.querySelectorAll('.smart-badge').forEach(b => b.classList.remove('is-active'));
+
+        // Remove injected bboxes
+        cvOverlay.querySelectorAll('.cv-bbox').forEach(b => b.remove());
+
+        // Reset submit
+        submitBtn.disabled = true;
+        submitBtn.classList.remove('is-ready');
+        submitText.textContent = 'Upload evidence to begin';
+        submitArrow.style.display = 'none';
+      }
+
+      /* ─── UPLOAD EVENTS ─── */
+      if (uploadZone && fileInput) {
+        uploadZone.addEventListener('click', () => fileInput.click());
+        uploadZone.addEventListener('dragover', e => {
+          e.preventDefault();
+          uploadZone.classList.add('is-dragover');
+        });
+        uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('is-dragover'));
+        uploadZone.addEventListener('drop', e => {
+          e.preventDefault();
+          uploadZone.classList.remove('is-dragover');
+          if (e.dataTransfer.files.length) {
+            fileInput.files = e.dataTransfer.files;
+            showEvidence(e.dataTransfer.files[0]);
+          }
+        });
+        fileInput.addEventListener('change', () => {
+          if (fileInput.files.length) showEvidence(fileInput.files[0]);
+        });
+      }
+      if (changeBtn) changeBtn.addEventListener('click', resetUpload);
+
+      /* ─── AI SCANNING SEQUENCE ─── */
+      function startAIScan() {
+        aiStatus.classList.add('is-active');
+        const checks = document.querySelectorAll('.ai-check');
+        let step = 0;
+
+        // Save original icons
+        checks.forEach(c => {
+          const ico = c.querySelector('.ai-check__icon');
+          ico.dataset.original = ico.innerHTML;
+        });
+
+        // Badge: scanning visible immediately
+        setTimeout(() => badgeScanning.classList.add('is-visible'), 300);
+
+        // Bounding boxes appear at step 0
+        setTimeout(() => injectBoundingBoxes(), 800);
+
+        function nextStep() {
+          if (step > 0) {
+            const prev = checks[step - 1];
+            prev.classList.remove('is-loading');
+            prev.classList.add('is-done');
+            prev.querySelector('.ai-check__icon').innerHTML =
+              '<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M3 6l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+          }
+
+          // Trigger side events at specific steps
+          if (step === 2) {
+            // Face blurred badge
+            badgeBlurred.classList.add('is-visible');
+            badgeScanning.querySelector('.cv-badge__dot').nextSibling.textContent = ' AI Analysis Active';
+            document.getElementById('sbPrivacy').classList.add('is-active');
+          }
+          if (step === 1) {
+            document.getElementById('sbConfidence').classList.add('is-active');
+          }
+          if (step === 3) {
+            document.getElementById('sbLocation').classList.add('is-active');
+          }
+
+          if (step < checks.length) {
+            checks[step].classList.add('is-loading');
+            checks[step].querySelector('.ai-check__icon').innerHTML =
+              '<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 2v2M6 8v2M2 6h2M8 6h2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>';
+            step++;
+            setTimeout(nextStep, 1200 + Math.random() * 600);
+          } else {
+            // All done
+            onAIComplete();
+          }
+        }
+
+        setTimeout(nextStep, 600);
+      }
+
+      function onAIComplete() {
+        aiComplete = true;
+        aiStatus.classList.add('is-complete');
+        document.getElementById('aiStatusTitle').textContent = 'Analysis Complete';
+        document.getElementById('aiStatusSub').textContent = 'Ready for authority review';
+
+        // Update scanning badge
+        badgeScanning.innerHTML =
+          '<div class="cv-badge__dot" style="background:var(--green-400);animation:none"></div> Analysis Complete';
+
+        // Enable submit
+        submitBtn.disabled = false;
+        submitBtn.classList.add('is-ready');
+        submitText.textContent = 'Submit for Authority Review';
+        submitArrow.style.display = '';
+      }
+
+      /* ─── INJECT CV BOUNDING BOXES ─── */
+      function injectBoundingBoxes() {
+        const bboxes = [
+          { top: '22%', left: '10%', w: '35%', h: '45%', label: 'Vehicle', cls: '', delay: 0 },
+          { top: '30%', left: '55%', w: '22%', h: '30%', label: 'Vehicle', cls: '', delay: 400 },
+          { top: '58%', left: '18%', w: '18%', h: '10%', label: 'License Plate', cls: 'cv-bbox--plate', delay: 1200 },
+          { top: '12%', left: '62%', w: '12%', h: '16%', label: 'Face Blurred', cls: 'cv-bbox--face', delay: 2000 },
+        ];
+
+        bboxes.forEach(b => {
+          setTimeout(() => {
+            const el = document.createElement('div');
+            el.className = 'cv-bbox ' + b.cls;
+            el.dataset.label = b.label;
+            el.style.cssText = 'top:' + b.top + ';left:' + b.left + ';width:' + b.w + ';height:' + b.h + ';';
+            cvOverlay.appendChild(el);
+
+            // Fade out non-face bboxes after a moment
+            if (!b.cls) {
+              setTimeout(() => {
+                el.style.transition = 'opacity 1s';
+                el.style.opacity = '.3';
+              }, 2500);
+            }
+          }, b.delay);
+        });
+      }
+
+      /* ─── VIOLATION PILL SELECTORS ─── */
+      document.querySelectorAll('.violation-pill').forEach(pill => {
+        pill.addEventListener('click', () => {
+          document.querySelectorAll('.violation-pill').forEach(p => p.classList.remove('is-active'));
+          pill.classList.add('is-active');
+          document.getElementById('violationType').value = pill.dataset.value;
+        });
+      });
+
+      /* ─── GPS BUTTON ─── */
+      const gpsBtn = document.getElementById('gpsBtn');
+      const locationInput = document.getElementById('locationInput');
+      if (gpsBtn && locationInput) {
+        gpsBtn.addEventListener('click', () => {
+          if (!navigator.geolocation) return;
+          gpsBtn.classList.add('is-detecting');
+          locationInput.value = 'Detecting location...';
+          navigator.geolocation.getCurrentPosition(
+            pos => {
+              locationInput.value = pos.coords.latitude.toFixed(4) + ', ' + pos.coords.longitude.toFixed(4);
+              gpsBtn.classList.remove('is-detecting');
+            },
+            () => {
+              locationInput.value = 'Location access denied';
+              gpsBtn.classList.remove('is-detecting');
+            }
+          );
+        });
+      }
+
+      /* ─── FORM SUBMIT WITH RIPPLE ─── */
+      const form = document.getElementById('reportForm');
+      if (form) {
+        form.addEventListener('submit', e => {
+          e.preventDefault();
+          if (!aiComplete) return;
+
+          // Ripple effect
+          submitBtn.style.transform = 'scale(.97)';
+          setTimeout(() => { submitBtn.style.transform = ''; }, 150);
+
+          // Disable and show processing
+          submitBtn.disabled = true;
+          submitBtn.classList.remove('is-ready');
+          submitText.textContent = 'Submitting...';
+          submitArrow.style.display = 'none';
+
+          setTimeout(() => {
+            alert('Report submitted successfully! Track it from your dashboard.');
+            resetUpload();
+          }, 1500);
+        });
+      }
+
+    })();
+  </script>
+</body>
+</html>

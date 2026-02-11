@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard — SARAL</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/dashboard.css" />
+</head>
+<body class="dash-body">
+
+  <!-- ═══════ SIDEBAR ═══════ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar__top">
+      <a href="index.html" class="sidebar__logo">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+          <circle cx="14" cy="14" r="12" stroke="url(#sLogoG)" stroke-width="2.5"/>
+          <path d="M9 14.5L12.5 18L19 11" stroke="url(#sLogoG)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <defs><linearGradient id="sLogoG" x1="0" y1="0" x2="28" y2="28"><stop stop-color="#4F8CFF"/><stop offset="1" stop-color="#A78BFA"/></linearGradient></defs>
+        </svg>
+        <span>SARAL</span>
+      </a>
+    </div>
+
+    <nav class="sidebar__nav">
+      <a href="dashboard.html" class="sidebar__link sidebar__link--active">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="2" width="7" height="7" rx="2" stroke="currentColor" stroke-width="1.5"/><rect x="11" y="2" width="7" height="7" rx="2" stroke="currentColor" stroke-width="1.5"/><rect x="2" y="11" width="7" height="7" rx="2" stroke="currentColor" stroke-width="1.5"/><rect x="11" y="11" width="7" height="7" rx="2" stroke="currentColor" stroke-width="1.5"/></svg>
+        <span>Overview</span>
+      </a>
+      <a href="report.html" class="sidebar__link">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M17 10a7 7 0 11-14 0 7 7 0 0114 0z" stroke="currentColor" stroke-width="1.5"/><path d="M10 7v3l2 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <span>New Report</span>
+      </a>
+      <a href="my-reports.html" class="sidebar__link">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 6h12M4 10h12M4 14h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <span>My Reports</span>
+      </a>
+      <a href="rewards.html" class="sidebar__link">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 2l2.09 4.26L17 6.97l-3.5 3.42.83 4.84L10 13.14l-4.33 2.09.83-4.84L3 6.97l4.91-.71L10 2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+        <span>Rewards</span>
+      </a>
+      <a href="settings.html" class="sidebar__link">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="3" stroke="currentColor" stroke-width="1.5"/><path d="M10 2v2M10 16v2M2 10h2M16 10h2M4.93 4.93l1.41 1.41M13.66 13.66l1.41 1.41M15.07 4.93l-1.41 1.41M6.34 13.66l-1.41 1.41" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <span>Settings</span>
+      </a>
+    </nav>
+
+    <div class="sidebar__profile">
+      <div class="sidebar__profile-avatar">
+        <span>AK</span>
+      </div>
+      <div class="sidebar__profile-info">
+        <span class="sidebar__profile-name">Aarav Kumar</span>
+        <span class="sidebar__profile-badge">
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><circle cx="5" cy="5" r="4" fill="#FFD700"/></svg>
+          Gold Champion
+        </span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ═══════ MOBILE HEADER ═══════ -->
+  <header class="dash-header" id="dashHeader">
+    <button class="dash-header__toggle" id="sidebarToggle">
+      <span></span><span></span><span></span>
+    </button>
+    <a href="index.html" class="dash-header__logo">SARAL</a>
+    <a href="report.html" class="dash-header__action">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 3v12M3 9h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </a>
+  </header>
+
+  <!-- ═══════ MAIN CONTENT ═══════ -->
+  <main class="dash-main">
+    <!-- Greeting -->
+    <div class="dash-greeting" data-reveal>
+      <div>
+        <h1 class="dash-greeting__title">Welcome back, <span class="text-gradient">Aarav</span></h1>
+        <p class="dash-greeting__sub">Your contribution makes roads safer. Keep reporting.</p>
+      </div>
+      <a href="report.html" class="btn btn--primary btn--glow">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <span>New Report</span>
+      </a>
+    </div>
+
+    <!-- Stats Row -->
+    <div class="dash-stats" data-reveal>
+      <div class="dash-stat dash-stat--blue">
+        <div class="dash-stat__icon">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 16V8M8 16V4M12 16v-5M16 16V9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </div>
+        <div class="dash-stat__info">
+          <span class="dash-stat__num" data-count="47">0</span>
+          <span class="dash-stat__label">Total Reports</span>
+        </div>
+        <span class="dash-stat__trend dash-stat__trend--up">+12%</span>
+      </div>
+      <div class="dash-stat dash-stat--green">
+        <div class="dash-stat__icon">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M18 10A8 8 0 112 10a8 8 0 0116 0z" stroke="currentColor" stroke-width="1.5"/><path d="M7 10l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="dash-stat__info">
+          <span class="dash-stat__num" data-count="42">0</span>
+          <span class="dash-stat__label">Verified</span>
+        </div>
+        <span class="dash-stat__trend dash-stat__trend--up">89%</span>
+      </div>
+      <div class="dash-stat dash-stat--amber">
+        <div class="dash-stat__icon">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 2l2.09 4.26L17 6.97l-3.5 3.42.83 4.84L10 13.14l-4.33 2.09.83-4.84L3 6.97l4.91-.71L10 2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="dash-stat__info">
+          <span class="dash-stat__num" data-count="1250">0</span>
+          <span class="dash-stat__label">Karma Points</span>
+        </div>
+        <span class="dash-stat__badge">Gold</span>
+      </div>
+      <div class="dash-stat dash-stat--violet">
+        <div class="dash-stat__icon">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M3 17V5a2 2 0 012-2h10a2 2 0 012 2v12l-3.5-2L10 17l-3.5-2L3 17z" stroke="currentColor" stroke-width="1.5"/></svg>
+        </div>
+        <div class="dash-stat__info">
+          <span class="dash-stat__num" data-count="3">0</span>
+          <span class="dash-stat__label">Pending</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Grid -->
+    <div class="dash-grid">
+      <!-- Activity Chart -->
+      <div class="dash-card dash-card--wide" data-reveal>
+        <div class="dash-card__header">
+          <h3>Reporting Activity</h3>
+          <div class="dash-card__tabs">
+            <button class="dash-card__tab dash-card__tab--active">Week</button>
+            <button class="dash-card__tab">Month</button>
+            <button class="dash-card__tab">Year</button>
+          </div>
+        </div>
+        <div class="dash-chart">
+          <div class="dash-chart__bars">
+            <div class="dash-chart__bar-group">
+              <div class="dash-chart__bar" style="--h: 40%"><span>Mon</span></div>
+            </div>
+            <div class="dash-chart__bar-group">
+              <div class="dash-chart__bar" style="--h: 65%"><span>Tue</span></div>
+            </div>
+            <div class="dash-chart__bar-group">
+              <div class="dash-chart__bar" style="--h: 35%"><span>Wed</span></div>
+            </div>
+            <div class="dash-chart__bar-group">
+              <div class="dash-chart__bar dash-chart__bar--accent" style="--h: 85%"><span>Thu</span></div>
+            </div>
+            <div class="dash-chart__bar-group">
+              <div class="dash-chart__bar" style="--h: 55%"><span>Fri</span></div>
+            </div>
+            <div class="dash-chart__bar-group">
+              <div class="dash-chart__bar" style="--h: 70%"><span>Sat</span></div>
+            </div>
+            <div class="dash-chart__bar-group">
+              <div class="dash-chart__bar" style="--h: 25%"><span>Sun</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Reports -->
+      <div class="dash-card" data-reveal>
+        <div class="dash-card__header">
+          <h3>Recent Reports</h3>
+          <a href="#" class="dash-card__link">View all</a>
+        </div>
+        <div class="dash-reports">
+          <div class="dash-report">
+            <div class="dash-report__icon dash-report__icon--red">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v5M8 11h.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </div>
+            <div class="dash-report__info">
+              <span class="dash-report__title">Signal Violation — MG Road</span>
+              <span class="dash-report__time">2 hours ago</span>
+            </div>
+            <span class="dash-report__status dash-report__status--verified">Verified</span>
+          </div>
+          <div class="dash-report">
+            <div class="dash-report__icon dash-report__icon--amber">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v5M8 11h.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </div>
+            <div class="dash-report__info">
+              <span class="dash-report__title">Wrong-Way Driving — NH48</span>
+              <span class="dash-report__time">5 hours ago</span>
+            </div>
+            <span class="dash-report__status dash-report__status--pending">Pending</span>
+          </div>
+          <div class="dash-report">
+            <div class="dash-report__icon dash-report__icon--green">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M5 8l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="dash-report__info">
+              <span class="dash-report__title">Parking Violation — Sector 17</span>
+              <span class="dash-report__time">Yesterday</span>
+            </div>
+            <span class="dash-report__status dash-report__status--resolved">Resolved</span>
+          </div>
+          <div class="dash-report">
+            <div class="dash-report__icon dash-report__icon--green">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M5 8l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="dash-report__info">
+              <span class="dash-report__title">Over Speeding — Ring Road</span>
+              <span class="dash-report__time">2 days ago</span>
+            </div>
+            <span class="dash-report__status dash-report__status--resolved">Resolved</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Karma Progress -->
+      <div class="dash-card dash-card--karma" data-reveal>
+        <div class="dash-card__header">
+          <h3>Karma Progress</h3>
+        </div>
+        <div class="dash-karma">
+          <div class="dash-karma__circle">
+            <svg viewBox="0 0 120 120">
+              <circle cx="60" cy="60" r="52" fill="none" stroke="var(--gray-100)" stroke-width="8"/>
+              <circle cx="60" cy="60" r="52" fill="none" stroke="url(#karmaGrad)" stroke-width="8" stroke-linecap="round"
+                stroke-dasharray="326.73" stroke-dashoffset="82" transform="rotate(-90 60 60)"/>
+              <defs>
+                <linearGradient id="karmaGrad" x1="0" y1="0" x2="120" y2="120">
+                  <stop stop-color="#4F8CFF"/>
+                  <stop offset="1" stop-color="#A78BFA"/>
+                </linearGradient>
+              </defs>
+            </svg>
+            <div class="dash-karma__value">
+              <span class="dash-karma__num">1,250</span>
+              <span class="dash-karma__of">/ 1,500</span>
+            </div>
+          </div>
+          <div class="dash-karma__tiers">
+            <div class="dash-karma__tier dash-karma__tier--done">Bronze</div>
+            <div class="dash-karma__tier dash-karma__tier--done">Silver</div>
+            <div class="dash-karma__tier dash-karma__tier--current">Gold</div>
+            <div class="dash-karma__tier">Platinum</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contribution Heatmap -->
+      <div class="dash-card dash-card--wide" data-reveal>
+        <div class="dash-card__header">
+          <h3>Contribution Map</h3>
+          <span class="dash-card__sub">Last 12 weeks</span>
+        </div>
+        <div class="dash-heatmap" id="heatmap"></div>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/dashboard.js"></script>
+</body>
+</html>

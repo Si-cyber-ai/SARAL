@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Authority Dashboard — SARAL</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/dashboard.css" />
+  <style>
+    /* Authority-specific overrides */
+    .sidebar__link--active {
+      color: var(--violet-500);
+      background: rgba(139,92,246,.06);
+    }
+    .sidebar__link--active::before {
+      background: linear-gradient(135deg, var(--violet-500), var(--blue-500));
+    }
+
+    .auth-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--violet-500);
+      background: rgba(139,92,246,.06);
+      padding: 4px 12px;
+      border-radius: var(--radius-full);
+      margin-left: 12px;
+    }
+
+    .case-queue { display: flex; flex-direction: column; gap: 12px; }
+
+    .case-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 18px 20px;
+      border-radius: var(--radius-lg);
+      background: #fff;
+      border: 1px solid var(--gray-100);
+      transition: all var(--duration-normal) var(--ease-out);
+      cursor: pointer;
+    }
+    .case-item:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateX(4px);
+      border-color: rgba(139,92,246,.12);
+    }
+
+    .case-item__priority {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .case-item__priority--high { background: var(--red-500); box-shadow: 0 0 8px rgba(239,68,68,.3); }
+    .case-item__priority--medium { background: var(--amber-500); }
+    .case-item__priority--low { background: var(--green-500); }
+
+    .case-item__info { flex: 1; }
+    .case-item__type {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--gray-800);
+      display: block;
+    }
+    .case-item__meta {
+      font-size: 12px;
+      color: var(--gray-400);
+      display: flex;
+      gap: 12px;
+      margin-top: 4px;
+    }
+
+    .case-item__ai {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--blue-500);
+      background: var(--blue-50);
+      padding: 4px 12px;
+      border-radius: var(--radius-full);
+    }
+
+    .case-item__actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .case-action {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      border: 1px solid var(--gray-100);
+      color: var(--gray-400);
+      transition: all var(--duration-fast);
+    }
+    .case-action:hover { background: var(--gray-50); color: var(--gray-700); }
+    .case-action--approve:hover { background: rgba(16,185,129,.06); color: var(--green-500); border-color: rgba(16,185,129,.2); }
+    .case-action--reject:hover { background: rgba(239,68,68,.06); color: var(--red-500); border-color: rgba(239,68,68,.2); }
+
+    /* Overview stats override for authority */
+    .auth-overview {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .auth-stat {
+      padding: 24px;
+      border-radius: var(--radius-xl);
+      background: #fff;
+      border: 1px solid var(--gray-100);
+      transition: all var(--duration-normal) var(--ease-out);
+      position: relative;
+      overflow: hidden;
+    }
+    .auth-stat::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+    }
+    .auth-stat--pending::before { background: var(--amber-400); }
+    .auth-stat--reviewed::before { background: var(--blue-400); }
+    .auth-stat--actioned::before { background: var(--green-400); }
+
+    .auth-stat:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .auth-stat__num {
+      font-family: var(--font-display);
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--gray-900);
+      line-height: 1.2;
+    }
+    .auth-stat__label {
+      font-size: 13px;
+      color: var(--gray-400);
+      margin-top: 4px;
+    }
+
+    .dash-card--ai-insights {
+      background: linear-gradient(135deg, rgba(79,140,255,.02), rgba(139,92,246,.03));
+      border-color: rgba(79,140,255,.08);
+    }
+
+    .ai-insight {
+      display: flex;
+      gap: 12px;
+      padding: 14px;
+      border-radius: var(--radius-md);
+      background: rgba(255,255,255,.7);
+      border: 1px solid var(--gray-50);
+      margin-bottom: 10px;
+    }
+    .ai-insight:last-child { margin-bottom: 0; }
+
+    .ai-insight__icon {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: var(--blue-50);
+      color: var(--blue-500);
+      flex-shrink: 0;
+      font-size: 14px;
+    }
+
+    .ai-insight__text {
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--gray-600);
+    }
+    .ai-insight__text strong {
+      color: var(--gray-800);
+    }
+  </style>
+</head>
+<body class="dash-body">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar__top">
+      <a href="index.html" class="sidebar__logo">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+          <circle cx="14" cy="14" r="12" stroke="url(#sLogoG2)" stroke-width="2.5"/>
+          <path d="M9 14.5L12.5 18L19 11" stroke="url(#sLogoG2)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <defs><linearGradient id="sLogoG2" x1="0" y1="0" x2="28" y2="28"><stop stop-color="#4F8CFF"/><stop offset="1" stop-color="#A78BFA"/></linearGradient></defs>
+        </svg>
+        <span>SARAL</span>
+        <span class="auth-badge">Authority</span>
+      </a>
+    </div>
+
+    <nav class="sidebar__nav">
+      <a href="authority.html" class="sidebar__link sidebar__link--active">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="2" width="7" height="7" rx="2" stroke="currentColor" stroke-width="1.5"/><rect x="11" y="2" width="7" height="7" rx="2" stroke="currentColor" stroke-width="1.5"/><rect x="2" y="11" width="7" height="7" rx="2" stroke="currentColor" stroke-width="1.5"/><rect x="11" y="11" width="7" height="7" rx="2" stroke="currentColor" stroke-width="1.5"/></svg>
+        <span>Case Queue</span>
+      </a>
+      <a href="#" class="sidebar__link">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 16V8M8 16V4M12 16v-5M16 16V9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <span>Analytics</span>
+      </a>
+      <a href="#" class="sidebar__link">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M12 2H4a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" stroke="currentColor" stroke-width="1.5"/><path d="M12 2v6h6" stroke="currentColor" stroke-width="1.5"/></svg>
+        <span>Reports Archive</span>
+      </a>
+      <a href="#" class="sidebar__link">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="3" stroke="currentColor" stroke-width="1.5"/><path d="M10 2v2M10 16v2M2 10h2M16 10h2M4.93 4.93l1.41 1.41M13.66 13.66l1.41 1.41M15.07 4.93l-1.41 1.41M6.34 13.66l-1.41 1.41" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <span>Settings</span>
+      </a>
+    </nav>
+
+    <div class="sidebar__profile">
+      <div class="sidebar__profile-avatar" style="background: linear-gradient(135deg, #8B5CF6, #4F8CFF);">
+        <span>TP</span>
+      </div>
+      <div class="sidebar__profile-info">
+        <span class="sidebar__profile-name">Insp. T. Prasad</span>
+        <span class="sidebar__profile-badge" style="color: var(--violet-500);">
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M5 1l1.2 2.4L9 3.8 7 5.7l.5 2.8L5 7.3 2.5 8.5 3 5.7 1 3.8l2.8-.4L5 1z" fill="#8B5CF6"/></svg>
+          Traffic Inspector
+        </span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MOBILE HEADER -->
+  <header class="dash-header" id="dashHeader">
+    <button class="dash-header__toggle" id="sidebarToggle">
+      <span></span><span></span><span></span>
+    </button>
+    <a href="index.html" class="dash-header__logo">SARAL Authority</a>
+    <span></span>
+  </header>
+
+  <!-- MAIN -->
+  <main class="dash-main">
+    <div class="dash-greeting" data-reveal>
+      <div>
+        <h1 class="dash-greeting__title">Case Queue</h1>
+        <p class="dash-greeting__sub">AI-prioritized cases awaiting your review</p>
+      </div>
+    </div>
+
+    <!-- Overview Stats -->
+    <div class="auth-overview" data-reveal>
+      <div class="auth-stat auth-stat--pending">
+        <span class="auth-stat__num" data-count="18">0</span>
+        <span class="auth-stat__label">Pending Review</span>
+      </div>
+      <div class="auth-stat auth-stat--reviewed">
+        <span class="auth-stat__num" data-count="124">0</span>
+        <span class="auth-stat__label">Reviewed This Week</span>
+      </div>
+      <div class="auth-stat auth-stat--actioned">
+        <span class="auth-stat__num" data-count="89">0</span>
+        <span class="auth-stat__label">Actions Taken (%)</span>
+      </div>
+    </div>
+
+    <div class="dash-grid">
+      <!-- Case Queue -->
+      <div class="dash-card dash-card--wide" data-reveal>
+        <div class="dash-card__header">
+          <h3>Priority Cases</h3>
+          <div class="dash-card__tabs">
+            <button class="dash-card__tab dash-card__tab--active">All</button>
+            <button class="dash-card__tab">High</button>
+            <button class="dash-card__tab">Medium</button>
+          </div>
+        </div>
+        <div class="case-queue">
+          <div class="case-item">
+            <div class="case-item__priority case-item__priority--high"></div>
+            <div class="case-item__info">
+              <span class="case-item__type">Signal Jumping — KA-01-AB-1234</span>
+              <div class="case-item__meta">
+                <span>MG Road, Bangalore</span>
+                <span>2h ago</span>
+              </div>
+            </div>
+            <span class="case-item__ai">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="4" stroke="currentColor" stroke-width="1.2"/><circle cx="6" cy="6" r="1.5" fill="currentColor"/></svg>
+              AI: 97% match
+            </span>
+            <div class="case-item__actions">
+              <button class="case-action case-action--approve" title="Approve">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M4 7l2.5 2.5L10 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <button class="case-action case-action--reject" title="Dismiss">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M4 4l6 6M10 4l-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="case-item">
+            <div class="case-item__priority case-item__priority--high"></div>
+            <div class="case-item__info">
+              <span class="case-item__type">Wrong-Way Driving — DL-02-CD-5678</span>
+              <div class="case-item__meta">
+                <span>NH-48, Delhi</span>
+                <span>3h ago</span>
+              </div>
+            </div>
+            <span class="case-item__ai">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="4" stroke="currentColor" stroke-width="1.2"/><circle cx="6" cy="6" r="1.5" fill="currentColor"/></svg>
+              AI: 94% match
+            </span>
+            <div class="case-item__actions">
+              <button class="case-action case-action--approve" title="Approve">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M4 7l2.5 2.5L10 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <button class="case-action case-action--reject" title="Dismiss">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M4 4l6 6M10 4l-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="case-item">
+            <div class="case-item__priority case-item__priority--medium"></div>
+            <div class="case-item__info">
+              <span class="case-item__type">Over Speeding — MH-12-EF-9012</span>
+              <div class="case-item__meta">
+                <span>Pune-Mumbai Expressway</span>
+                <span>5h ago</span>
+              </div>
+            </div>
+            <span class="case-item__ai">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="4" stroke="currentColor" stroke-width="1.2"/><circle cx="6" cy="6" r="1.5" fill="currentColor"/></svg>
+              AI: 88% match
+            </span>
+            <div class="case-item__actions">
+              <button class="case-action case-action--approve" title="Approve">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M4 7l2.5 2.5L10 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <button class="case-action case-action--reject" title="Dismiss">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M4 4l6 6M10 4l-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="case-item">
+            <div class="case-item__priority case-item__priority--low"></div>
+            <div class="case-item__info">
+              <span class="case-item__type">Illegal Parking — KA-05-GH-3456</span>
+              <div class="case-item__meta">
+                <span>Sector 17, Chandigarh</span>
+                <span>8h ago</span>
+              </div>
+            </div>
+            <span class="case-item__ai">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="4" stroke="currentColor" stroke-width="1.2"/><circle cx="6" cy="6" r="1.5" fill="currentColor"/></svg>
+              AI: 91% match
+            </span>
+            <div class="case-item__actions">
+              <button class="case-action case-action--approve" title="Approve">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M4 7l2.5 2.5L10 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <button class="case-action case-action--reject" title="Dismiss">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M4 4l6 6M10 4l-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI Insights -->
+      <div class="dash-card dash-card--ai-insights" data-reveal>
+        <div class="dash-card__header">
+          <h3>AI Insights</h3>
+        </div>
+        <div class="ai-insight">
+          <div class="ai-insight__icon">📊</div>
+          <div class="ai-insight__text">
+            <strong>Spike detected:</strong> 40% increase in signal violations at MG Road junction this week.
+          </div>
+        </div>
+        <div class="ai-insight">
+          <div class="ai-insight__icon">🎯</div>
+          <div class="ai-insight__text">
+            <strong>Pattern found:</strong> Most wrong-way incidents occur 11PM–1AM on NH-48.
+          </div>
+        </div>
+        <div class="ai-insight">
+          <div class="ai-insight__icon">⚡</div>
+          <div class="ai-insight__text">
+            <strong>Recommendation:</strong> Deploy mobile unit at Sector 17 during peak hours.
+          </div>
+        </div>
+      </div>
+
+      <!-- Response Time -->
+      <div class="dash-card" data-reveal>
+        <div class="dash-card__header">
+          <h3>Response Time</h3>
+        </div>
+        <div style="text-align: center; padding: 20px 0;">
+          <div style="font-family: var(--font-display); font-size: 48px; font-weight: 700; background: var(--grad-blue); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">47<span style="font-size: 24px;">min</span></div>
+          <div style="font-size: 13px; color: var(--gray-400); margin-top: 8px;">Average response time</div>
+          <div style="font-size: 12px; color: var(--green-500); font-weight: 600; margin-top: 4px;">↓ 12% from last week</div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/dashboard.js"></script>
+</body>
+</html>

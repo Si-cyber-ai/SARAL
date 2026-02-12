@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign In — SARAL</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/auth.css" />
+</head>
+<body class="auth-body">
+
+  <!-- Ambient background -->
+  <div class="auth-ambient" aria-hidden="true">
+    <div class="auth-ambient__blob auth-ambient__blob--1"></div>
+    <div class="auth-ambient__blob auth-ambient__blob--2"></div>
+  </div>
+
+  <div class="auth-container">
+    <!-- Left — Branding panel -->
+    <div class="auth-brand">
+      <div class="auth-brand__content">
+        <a href="index.html" class="auth-brand__logo">
+          <svg width="36" height="36" viewBox="0 0 28 28" fill="none">
+            <circle cx="14" cy="14" r="12" stroke="url(#aLogoG)" stroke-width="2.5"/>
+            <path d="M9 14.5L12.5 18L19 11" stroke="url(#aLogoG)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <defs><linearGradient id="aLogoG" x1="0" y1="0" x2="28" y2="28"><stop stop-color="#4F8CFF"/><stop offset="1" stop-color="#A78BFA"/></linearGradient></defs>
+          </svg>
+          <span>SARAL</span>
+        </a>
+        <h1 class="auth-brand__title">Making Roads<br/><span>Safer Together</span></h1>
+        <p class="auth-brand__desc">India's AI-powered civic road safety platform. Report violations, earn rewards, drive change.</p>
+        <div class="auth-brand__stats">
+          <div class="auth-brand__stat">
+            <span class="auth-brand__stat-num">12K+</span>
+            <span class="auth-brand__stat-label">Reports Filed</span>
+          </div>
+          <div class="auth-brand__stat">
+            <span class="auth-brand__stat-num">94%</span>
+            <span class="auth-brand__stat-label">AI Accuracy</span>
+          </div>
+          <div class="auth-brand__stat">
+            <span class="auth-brand__stat-num">47</span>
+            <span class="auth-brand__stat-label">Cities Active</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right — Sign In Form -->
+    <div class="auth-form-panel">
+      <div class="auth-form-wrapper">
+        <!-- Mobile logo -->
+        <a href="index.html" class="auth-mobile-logo">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+            <circle cx="14" cy="14" r="12" stroke="url(#aLogoG2)" stroke-width="2.5"/>
+            <path d="M9 14.5L12.5 18L19 11" stroke="url(#aLogoG2)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <defs><linearGradient id="aLogoG2" x1="0" y1="0" x2="28" y2="28"><stop stop-color="#4F8CFF"/><stop offset="1" stop-color="#A78BFA"/></linearGradient></defs>
+          </svg>
+          <span>SARAL</span>
+        </a>
+
+        <h2 class="auth-form__title">Welcome back</h2>
+        <p class="auth-form__sub">Sign in to your account to continue</p>
+
+        <form class="auth-form" id="signinForm" autocomplete="off">
+          <div class="auth-field">
+            <label class="auth-field__label" for="email">Email address</label>
+            <div class="auth-field__input-wrap">
+              <svg class="auth-field__icon" width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2" y="4" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.3"/><path d="M2 6l7 4 7-4" stroke="currentColor" stroke-width="1.3"/></svg>
+              <input class="auth-field__input" type="email" id="email" placeholder="you@email.com" required />
+            </div>
+          </div>
+
+          <div class="auth-field">
+            <label class="auth-field__label" for="password">Password</label>
+            <div class="auth-field__input-wrap">
+              <svg class="auth-field__icon" width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="4" y="8" width="10" height="8" rx="2" stroke="currentColor" stroke-width="1.3"/><path d="M6 8V6a3 3 0 016 0v2" stroke="currentColor" stroke-width="1.3"/><circle cx="9" cy="12" r="1" fill="currentColor"/></svg>
+              <input class="auth-field__input" type="password" id="password" placeholder="••••••••" required />
+            </div>
+          </div>
+
+          <!-- Role Selector -->
+          <div class="auth-field">
+            <label class="auth-field__label">Sign in as</label>
+            <div class="auth-role-selector">
+              <label class="auth-role">
+                <input type="radio" name="role" value="user" checked />
+                <div class="auth-role__card">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.5"/><path d="M4 20c0-4.42 3.58-7 8-7s8 2.58 8 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                  <span class="auth-role__title">Citizen</span>
+                  <span class="auth-role__desc">Report & earn rewards</span>
+                </div>
+              </label>
+              <label class="auth-role">
+                <input type="radio" name="role" value="authority" />
+                <div class="auth-role__card">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 2L3 7v5c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-9-5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  <span class="auth-role__title">Authority</span>
+                  <span class="auth-role__desc">Review & take action</span>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <div class="auth-error" id="authError" style="display:none;"></div>
+
+          <button type="submit" class="auth-submit">
+            <span>Sign In</span>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </form>
+
+        <p class="auth-switch">
+          Don't have an account? <a href="signup.html">Create Account</a>
+        </p>
+
+        <!-- Demo credentials -->
+        <div class="auth-demo">
+          <span class="auth-demo__label">Demo Accounts</span>
+          <button class="auth-demo__btn" data-email="aarav@saral.in" data-password="citizen123" data-role="user">
+            <span class="auth-demo__dot auth-demo__dot--blue"></span>Citizen: aarav@saral.in
+          </button>
+          <button class="auth-demo__btn" data-email="prasad@authority.in" data-password="authority123" data-role="authority">
+            <span class="auth-demo__dot auth-demo__dot--violet"></span>Authority: prasad@authority.in
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/store.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    (function() {
+      // If already logged in, redirect
+      if (SaralAuth.isAuthenticated()) {
+        SaralAuth.redirectToDashboard();
+        return;
+      }
+
+      const form = document.getElementById('signinForm');
+      const errorEl = document.getElementById('authError');
+
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        errorEl.style.display = 'none';
+
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value;
+        const role = document.querySelector('input[name="role"]:checked').value;
+
+        const result = SaralAuth.signIn(email, password, role);
+
+        if (result.success) {
+          SaralToast.show(`Welcome back, ${result.user.name}!`, 'success');
+          setTimeout(() => SaralAuth.redirectToDashboard(), 600);
+        } else {
+          errorEl.textContent = result.error;
+          errorEl.style.display = 'block';
+        }
+      });
+
+      // Demo account quick-fill
+      document.querySelectorAll('.auth-demo__btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.getElementById('email').value = btn.dataset.email;
+          document.getElementById('password').value = btn.dataset.password;
+          const radio = document.querySelector(`input[name="role"][value="${btn.dataset.role}"]`);
+          if (radio) radio.checked = true;
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

@@ -40,10 +40,10 @@
         <a href="#rewards" class="nav__link">Rewards</a>
       </div>
 
-      <div class="nav__actions">
-        <a href="dashboard.html" class="nav__btn nav__btn--ghost">Dashboard</a>
-        <a href="report.html" class="nav__btn nav__btn--primary">
-          <span>Report Now</span>
+      <div class="nav__actions" id="navActions">
+        <a href="signin.html" class="nav__btn nav__btn--ghost">Sign In</a>
+        <a href="signup.html" class="nav__btn nav__btn--primary">
+          <span>Get Started</span>
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </a>
       </div>
@@ -751,5 +751,11 @@
   </footer>
 
   <script src="js/main.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    // Dynamic navbar based on auth state
+    SaralNav.render();
+  </script>
 </body>
 </html>

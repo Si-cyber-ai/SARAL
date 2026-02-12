@@ -59,6 +59,10 @@
         </span>
       </div>
     </div>
+    <button class="sidebar__logout" onclick="SaralAuth.signOut()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>Logout</span>
+    </button>
   </aside>
 
   <!-- ═══════ MOBILE HEADER ═══════ -->
@@ -126,6 +130,8 @@
   </main>
 
   <script src="js/store.js"></script>
+  <script src="js/auth.js"></script>
+  <script>SaralAuth.requireAuth('user');</script>
   <script src="js/rewards.js"></script>
 </body>
 </html>

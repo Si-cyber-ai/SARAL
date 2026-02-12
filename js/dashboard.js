@@ -74,8 +74,8 @@
   if (heatmap) {
     const levels = ['', 'l1', 'l2', 'l3', 'l4'];
     const data = [];
-    // Generate 84 cells (12 weeks × 7 days)
-    for (let i = 0; i < 84; i++) {
+    // Generate 240 cells (24 weeks × 10 rows)
+    for (let i = 0; i < 240; i++) {
       const rand = Math.random();
       let level = 0;
       if (rand > 0.7) level = 1;

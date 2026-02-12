@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Analytics — Authority Dashboard — SARAL</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/dashboard.css" />
+  <link rel="stylesheet" href="css/authority.css" />
+</head>
+<body class="dash-body">
+
+  <!-- ═══════ SIDEBAR ═══════ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar__top">
+      <a href="index.html" class="sidebar__logo">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+          <circle cx="14" cy="14" r="12" stroke="url(#sLogoG2)" stroke-width="2.5"/>
+          <path d="M9 14.5L12.5 18L19 11" stroke="url(#sLogoG2)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <defs><linearGradient id="sLogoG2" x1="0" y1="0" x2="28" y2="28"><stop stop-color="#4F8CFF"/><stop offset="1" stop-color="#A78BFA"/></linearGradient></defs>
+        </svg>
+        <span>SARAL</span>
+        <span class="auth-badge">Authority</span>
+      </a>
+    </div>
+
+    <nav class="sidebar__nav">
+      <a href="authority.html" class="sidebar__link">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="2" width="7" height="7" rx="2" stroke="currentColor" stroke-width="1.5"/><rect x="11" y="2" width="7" height="7" rx="2" stroke="currentColor" stroke-width="1.5"/><rect x="2" y="11" width="7" height="7" rx="2" stroke="currentColor" stroke-width="1.5"/><rect x="11" y="11" width="7" height="7" rx="2" stroke="currentColor" stroke-width="1.5"/></svg>
+        <span>Case Queue</span>
+      </a>
+      <a href="authority-analytics.html" class="sidebar__link sidebar__link--active">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 16V8M8 16V4M12 16v-5M16 16V9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <span>Analytics</span>
+      </a>
+      <a href="authority-archive.html" class="sidebar__link">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M12 2H4a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" stroke="currentColor" stroke-width="1.5"/><path d="M12 2v6h6" stroke="currentColor" stroke-width="1.5"/></svg>
+        <span>Reports Archive</span>
+      </a>
+      <a href="authority-settings.html" class="sidebar__link">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="3" stroke="currentColor" stroke-width="1.5"/><path d="M10 2v2M10 16v2M2 10h2M16 10h2M4.93 4.93l1.41 1.41M13.66 13.66l1.41 1.41M15.07 4.93l-1.41 1.41M6.34 13.66l-1.41 1.41" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <span>Settings</span>
+      </a>
+    </nav>
+
+    <div class="sidebar__profile">
+      <div class="sidebar__profile-avatar" style="background: linear-gradient(135deg, #8B5CF6, #4F8CFF);">
+        <span>TP</span>
+      </div>
+      <div class="sidebar__profile-info">
+        <span class="sidebar__profile-name">Insp. T. Prasad</span>
+        <span class="sidebar__profile-badge" style="color: var(--violet-500);">
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M5 1l1.2 2.4L9 3.8 7 5.7l.5 2.8L5 7.3 2.5 8.5 3 5.7 1 3.8l2.8-.4L5 1z" fill="#8B5CF6"/></svg>
+          Traffic Inspector
+        </span>
+      </div>
+    </div>
+    <button class="sidebar__logout" onclick="SaralAuth.signOut()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>Logout</span>
+    </button>
+  </aside>
+
+  <!-- MOBILE HEADER -->
+  <header class="dash-header" id="dashHeader">
+    <button class="dash-header__toggle" id="sidebarToggle">
+      <span></span><span></span><span></span>
+    </button>
+    <a href="index.html" class="dash-header__logo">SARAL Authority</a>
+    <span></span>
+  </header>
+
+  <!-- MAIN -->
+  <main class="dash-main">
+    <div class="dash-greeting" data-reveal>
+      <div>
+        <h1 class="dash-greeting__title">Analytics</h1>
+        <p class="dash-greeting__sub">Enforcement performance &amp; violation trends</p>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filter-bar" data-reveal>
+      <select class="filter-bar__select" id="filterRange">
+        <option value="7">Last 7 days</option>
+        <option value="30" selected>Last 30 days</option>
+        <option value="90">Last 90 days</option>
+      </select>
+      <select class="filter-bar__select" id="filterCity">
+        <option value="all">All Cities</option>
+        <option value="bangalore">Bangalore</option>
+        <option value="delhi">Delhi</option>
+        <option value="mumbai">Mumbai</option>
+        <option value="pune">Pune</option>
+        <option value="chandigarh">Chandigarh</option>
+        <option value="hyderabad">Hyderabad</option>
+        <option value="chennai">Chennai</option>
+      </select>
+    </div>
+
+    <!-- KPI Cards -->
+    <div class="kpi-grid" data-reveal>
+      <div class="kpi-card">
+        <div class="kpi-card__icon kpi-card__icon--blue">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M12 2H4a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" stroke="currentColor" stroke-width="1.5"/><path d="M12 2v6h6" stroke="currentColor" stroke-width="1.5"/></svg>
+        </div>
+        <div class="kpi-card__num" id="kpiReviewed">1,247</div>
+        <div class="kpi-card__label">Total Reports Reviewed</div>
+        <span class="kpi-card__trend kpi-card__trend--up">↑ 14% vs prev</span>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-card__icon kpi-card__icon--amber">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/><path d="M10 6v4l2.5 1.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </div>
+        <div class="kpi-card__num" id="kpiAvgTime">23<span style="font-size: 16px; font-weight: 500; color: var(--gray-400);"> min</span></div>
+        <div class="kpi-card__label">Avg Review Time</div>
+        <span class="kpi-card__trend kpi-card__trend--up">↓ 8% faster</span>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-card__icon kpi-card__icon--green">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M6 10l3 3 5-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/></svg>
+        </div>
+        <div class="kpi-card__num" id="kpiApproval">87<span style="font-size: 16px; font-weight: 500; color: var(--gray-400);">%</span></div>
+        <div class="kpi-card__label">Approval Rate</div>
+        <span class="kpi-card__trend kpi-card__trend--up">↑ 3% vs prev</span>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-card__icon kpi-card__icon--violet">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 2L2 7l8 5 8-5-8-5zM2 13l8 5 8-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="kpi-card__num" id="kpiFalsePos">4.2<span style="font-size: 16px; font-weight: 500; color: var(--gray-400);">%</span></div>
+        <div class="kpi-card__label">False Positive Rate</div>
+        <span class="kpi-card__trend kpi-card__trend--down">↑ 0.3% vs prev</span>
+      </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="chart-row" data-reveal>
+      <!-- Line Chart — Reports reviewed per day -->
+      <div class="chart-box">
+        <div class="chart-box__header">
+          <span class="chart-box__title">Reports Reviewed Per Day</span>
+          <div class="chart-toggle">
+            <button class="chart-toggle__btn chart-toggle__btn--active" data-range="7">7 Days</button>
+            <button class="chart-toggle__btn" data-range="30">30 Days</button>
+          </div>
+        </div>
+        <div class="chart-canvas-wrap">
+          <canvas id="lineChart" height="220"></canvas>
+        </div>
+      </div>
+
+      <!-- Bar Chart — Violation distribution -->
+      <div class="chart-box">
+        <div class="chart-box__header">
+          <span class="chart-box__title">Violation Types</span>
+        </div>
+        <div class="chart-canvas-wrap">
+          <canvas id="barChart" height="220"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Metrics -->
+    <div class="dash-grid" data-reveal>
+      <div class="dash-card dash-card--wide">
+        <div class="dash-card__header">
+          <h3>Top Hotspot Locations</h3>
+        </div>
+        <div class="case-queue">
+          <div class="case-item" style="cursor: default;">
+            <div class="case-item__priority case-item__priority--high"></div>
+            <div class="case-item__info">
+              <span class="case-item__type">MG Road Junction, Bangalore</span>
+              <div class="case-item__meta">
+                <span>127 violations this month</span>
+                <span>Signal Jumping dominant</span>
+              </div>
+            </div>
+            <span class="case-item__ai">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="4" stroke="currentColor" stroke-width="1.2"/><circle cx="6" cy="6" r="1.5" fill="currentColor"/></svg>
+              Hotspot Score: 94
+            </span>
+          </div>
+          <div class="case-item" style="cursor: default;">
+            <div class="case-item__priority case-item__priority--high"></div>
+            <div class="case-item__info">
+              <span class="case-item__type">NH-48 Entry, Delhi</span>
+              <div class="case-item__meta">
+                <span>98 violations this month</span>
+                <span>Wrong-Way Driving dominant</span>
+              </div>
+            </div>
+            <span class="case-item__ai">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="4" stroke="currentColor" stroke-width="1.2"/><circle cx="6" cy="6" r="1.5" fill="currentColor"/></svg>
+              Hotspot Score: 89
+            </span>
+          </div>
+          <div class="case-item" style="cursor: default;">
+            <div class="case-item__priority case-item__priority--medium"></div>
+            <div class="case-item__info">
+              <span class="case-item__type">Pune-Mumbai Expressway KM 42</span>
+              <div class="case-item__meta">
+                <span>74 violations this month</span>
+                <span>Over Speeding dominant</span>
+              </div>
+            </div>
+            <span class="case-item__ai">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="4" stroke="currentColor" stroke-width="1.2"/><circle cx="6" cy="6" r="1.5" fill="currentColor"/></svg>
+              Hotspot Score: 76
+            </span>
+          </div>
+          <div class="case-item" style="cursor: default;">
+            <div class="case-item__priority case-item__priority--low"></div>
+            <div class="case-item__info">
+              <span class="case-item__type">Sector 17 Market, Chandigarh</span>
+              <div class="case-item__meta">
+                <span>41 violations this month</span>
+                <span>Illegal Parking dominant</span>
+              </div>
+            </div>
+            <span class="case-item__ai">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="4" stroke="currentColor" stroke-width="1.2"/><circle cx="6" cy="6" r="1.5" fill="currentColor"/></svg>
+              Hotspot Score: 52
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI Model Performance -->
+      <div class="dash-card dash-card--ai-insights">
+        <div class="dash-card__header">
+          <h3>AI Model Performance</h3>
+        </div>
+        <div class="ai-insight">
+          <div class="ai-insight__icon">🎯</div>
+          <div class="ai-insight__text">
+            <strong>Overall Accuracy:</strong> 94.2% — up 1.1% after last retrain cycle.
+          </div>
+        </div>
+        <div class="ai-insight">
+          <div class="ai-insight__icon">⏱️</div>
+          <div class="ai-insight__text">
+            <strong>Avg Inference:</strong> 1.3s per frame — within SLA threshold.
+          </div>
+        </div>
+        <div class="ai-insight">
+          <div class="ai-insight__icon">📉</div>
+          <div class="ai-insight__text">
+            <strong>False Positives:</strong> Night-time accuracy still 6% lower. Retraining scheduled.
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/store.js"></script>
+  <script src="js/auth.js"></script>
+  <script>SaralAuth.requireAuth('authority');</script>
+  <script src="js/dashboard.js"></script>
+  <script>
+    (function () {
+      'use strict';
+
+      /* ─── CHART RENDERING (lightweight canvas, no library) ─── */
+      const lineCanvas = document.getElementById('lineChart');
+      const barCanvas  = document.getElementById('barChart');
+
+      // --- Simulated data ---
+      const data7d  = [32, 41, 28, 55, 47, 38, 44];
+      const data30d = [25,32,41,28,55,47,38,44,51,33,42,29,60,48,36,50,46,31,39,57,43,35,52,41,27,48,53,37,45,40];
+      const labels7d = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+      const labels30d = Array.from({length: 30}, (_, i) => (i + 1).toString());
+
+      const violationTypes = ['Signal Jump', 'Wrong-Way', 'Speeding', 'Illegal Park', 'No Helmet', 'Lane Viol.'];
+      const violationCounts = [312, 187, 264, 148, 96, 73];
+      const violationColors = ['#4F8CFF','#8B5CF6','#F59E0B','#EF4444','#10B981','#64748B'];
+
+      function drawLineChart(canvas, data, labels) {
+        const ctx = canvas.getContext('2d');
+        const dpr = window.devicePixelRatio || 1;
+        const rect = canvas.parentElement.getBoundingClientRect();
+        canvas.width = rect.width * dpr;
+        canvas.height = 220 * dpr;
+        canvas.style.width = rect.width + 'px';
+        canvas.style.height = '220px';
+        ctx.scale(dpr, dpr);
+
+        const W = rect.width;
+        const H = 220;
+        const padTop = 20, padBottom = 32, padLeft = 40, padRight = 16;
+        const chartW = W - padLeft - padRight;
+        const chartH = H - padTop - padBottom;
+
+        ctx.clearRect(0, 0, W, H);
+
+        const maxVal = Math.max(...data) * 1.15;
+
+        // Grid lines
+        ctx.strokeStyle = '#F1F5F9';
+        ctx.lineWidth = 1;
+        for (let i = 0; i <= 4; i++) {
+          const y = padTop + (chartH / 4) * i;
+          ctx.beginPath(); ctx.moveTo(padLeft, y); ctx.lineTo(W - padRight, y); ctx.stroke();
+          ctx.fillStyle = '#94A3B8'; ctx.font = '11px Inter';
+          ctx.textAlign = 'right';
+          ctx.fillText(Math.round(maxVal - (maxVal / 4) * i), padLeft - 8, y + 4);
+        }
+
+        // Data line
+        const stepX = chartW / (data.length - 1);
+        const points = data.map((v, i) => ({
+          x: padLeft + stepX * i,
+          y: padTop + chartH - (v / maxVal) * chartH,
+        }));
+
+        // Area fill
+        const grad = ctx.createLinearGradient(0, padTop, 0, H - padBottom);
+        grad.addColorStop(0, 'rgba(79,140,255,.12)');
+        grad.addColorStop(1, 'rgba(79,140,255,.0)');
+        ctx.beginPath();
+        ctx.moveTo(points[0].x, H - padBottom);
+        points.forEach(p => ctx.lineTo(p.x, p.y));
+        ctx.lineTo(points[points.length - 1].x, H - padBottom);
+        ctx.closePath();
+        ctx.fillStyle = grad;
+        ctx.fill();
+
+        // Line
+        ctx.beginPath();
+        ctx.strokeStyle = '#4F8CFF';
+        ctx.lineWidth = 2.5;
+        ctx.lineJoin = 'round';
+        ctx.lineCap = 'round';
+        points.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+        ctx.stroke();
+
+        // Points
+        points.forEach(p => {
+          ctx.beginPath(); ctx.arc(p.x, p.y, 3.5, 0, Math.PI * 2);
+          ctx.fillStyle = '#fff'; ctx.fill();
+          ctx.strokeStyle = '#4F8CFF'; ctx.lineWidth = 2; ctx.stroke();
+        });
+
+        // X labels
+        ctx.fillStyle = '#94A3B8'; ctx.font = '11px Inter'; ctx.textAlign = 'center';
+        const labelStep = data.length > 10 ? Math.ceil(data.length / 10) : 1;
+        labels.forEach((l, i) => {
+          if (i % labelStep === 0) ctx.fillText(l, points[i].x, H - 8);
+        });
+      }
+
+      function drawBarChart(canvas, labels, values, colors) {
+        const ctx = canvas.getContext('2d');
+        const dpr = window.devicePixelRatio || 1;
+        const rect = canvas.parentElement.getBoundingClientRect();
+        canvas.width = rect.width * dpr;
+        canvas.height = 220 * dpr;
+        canvas.style.width = rect.width + 'px';
+        canvas.style.height = '220px';
+        ctx.scale(dpr, dpr);
+
+        const W = rect.width;
+        const H = 220;
+        const padTop = 16, padBottom = 40, padLeft = 12, padRight = 12;
+        const chartH = H - padTop - padBottom;
+        const barW = Math.min(36, (W - padLeft - padRight) / labels.length - 12);
+        const gap = ((W - padLeft - padRight) - barW * labels.length) / (labels.length + 1);
+        const maxVal = Math.max(...values) * 1.1;
+
+        ctx.clearRect(0, 0, W, H);
+
+        labels.forEach((label, i) => {
+          const x = padLeft + gap * (i + 1) + barW * i;
+          const barH = (values[i] / maxVal) * chartH;
+          const y = padTop + chartH - barH;
+          const radius = 4;
+
+          ctx.beginPath();
+          ctx.moveTo(x, y + radius);
+          ctx.arcTo(x, y, x + barW, y, radius);
+          ctx.arcTo(x + barW, y, x + barW, y + barH, radius);
+          ctx.lineTo(x + barW, padTop + chartH);
+          ctx.lineTo(x, padTop + chartH);
+          ctx.closePath();
+          ctx.fillStyle = colors[i];
+          ctx.fill();
+
+          // Value on top
+          ctx.fillStyle = '#334155'; ctx.font = '600 11px Inter'; ctx.textAlign = 'center';
+          ctx.fillText(values[i], x + barW / 2, y - 6);
+
+          // Label below
+          ctx.fillStyle = '#94A3B8'; ctx.font = '10px Inter';
+          ctx.fillText(label, x + barW / 2, H - 10);
+        });
+      }
+
+      // Initial draw
+      drawLineChart(lineCanvas, data7d, labels7d);
+      drawBarChart(barCanvas, violationTypes, violationCounts, violationColors);
+
+      // Toggle chart range
+      document.querySelectorAll('.chart-toggle__btn').forEach(btn => {
+        btn.addEventListener('click', function () {
+          document.querySelector('.chart-toggle__btn--active')?.classList.remove('chart-toggle__btn--active');
+          this.classList.add('chart-toggle__btn--active');
+          const range = parseInt(this.dataset.range);
+          if (range === 7) drawLineChart(lineCanvas, data7d, labels7d);
+          else drawLineChart(lineCanvas, data30d, labels30d);
+        });
+      });
+
+      // Redraw on resize
+      let resizeTimer;
+      window.addEventListener('resize', function () {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(function () {
+          const activeRange = parseInt(document.querySelector('.chart-toggle__btn--active')?.dataset.range || '7');
+          drawLineChart(lineCanvas, activeRange === 7 ? data7d : data30d, activeRange === 7 ? labels7d : labels30d);
+          drawBarChart(barCanvas, violationTypes, violationCounts, violationColors);
+        }, 200);
+      });
+
+      // Filter handlers (simulate data refresh with toast)
+      document.getElementById('filterRange').addEventListener('change', function () {
+        if (typeof SaralToast !== 'undefined') SaralToast.show('Data refreshed for ' + this.options[this.selectedIndex].text, 'info');
+      });
+      document.getElementById('filterCity').addEventListener('change', function () {
+        if (typeof SaralToast !== 'undefined') SaralToast.show('Filtered: ' + this.options[this.selectedIndex].text, 'info');
+      });
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reports Archive — Authority Dashboard — SARAL</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/dashboard.css" />
+  <link rel="stylesheet" href="css/authority.css" />
+</head>
+<body class="dash-body">
+
+  <!-- ═══════ SIDEBAR ═══════ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar__top">
+      <a href="index.html" class="sidebar__logo">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+          <circle cx="14" cy="14" r="12" stroke="url(#sLogoG2)" stroke-width="2.5"/>
+          <path d="M9 14.5L12.5 18L19 11" stroke="url(#sLogoG2)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <defs><linearGradient id="sLogoG2" x1="0" y1="0" x2="28" y2="28"><stop stop-color="#4F8CFF"/><stop offset="1" stop-color="#A78BFA"/></linearGradient></defs>
+        </svg>
+        <span>SARAL</span>
+        <span class="auth-badge">Authority</span>
+      </a>
+    </div>
+
+    <nav class="sidebar__nav">
+      <a href="authority.html" class="sidebar__link">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="2" width="7" height="7" rx="2" stroke="currentColor" stroke-width="1.5"/><rect x="11" y="2" width="7" height="7" rx="2" stroke="currentColor" stroke-width="1.5"/><rect x="2" y="11" width="7" height="7" rx="2" stroke="currentColor" stroke-width="1.5"/><rect x="11" y="11" width="7" height="7" rx="2" stroke="currentColor" stroke-width="1.5"/></svg>
+        <span>Case Queue</span>
+      </a>
+      <a href="authority-analytics.html" class="sidebar__link">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 16V8M8 16V4M12 16v-5M16 16V9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <span>Analytics</span>
+      </a>
+      <a href="authority-archive.html" class="sidebar__link sidebar__link--active">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M12 2H4a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" stroke="currentColor" stroke-width="1.5"/><path d="M12 2v6h6" stroke="currentColor" stroke-width="1.5"/></svg>
+        <span>Reports Archive</span>
+      </a>
+      <a href="authority-settings.html" class="sidebar__link">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="3" stroke="currentColor" stroke-width="1.5"/><path d="M10 2v2M10 16v2M2 10h2M16 10h2M4.93 4.93l1.41 1.41M13.66 13.66l1.41 1.41M15.07 4.93l-1.41 1.41M6.34 13.66l-1.41 1.41" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <span>Settings</span>
+      </a>
+    </nav>
+
+    <div class="sidebar__profile">
+      <div class="sidebar__profile-avatar" style="background: linear-gradient(135deg, #8B5CF6, #4F8CFF);">
+        <span>TP</span>
+      </div>
+      <div class="sidebar__profile-info">
+        <span class="sidebar__profile-name">Insp. T. Prasad</span>
+        <span class="sidebar__profile-badge" style="color: var(--violet-500);">
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M5 1l1.2 2.4L9 3.8 7 5.7l.5 2.8L5 7.3 2.5 8.5 3 5.7 1 3.8l2.8-.4L5 1z" fill="#8B5CF6"/></svg>
+          Traffic Inspector
+        </span>
+      </div>
+    </div>
+    <button class="sidebar__logout" onclick="SaralAuth.signOut()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>Logout</span>
+    </button>
+  </aside>
+
+  <!-- MOBILE HEADER -->
+  <header class="dash-header" id="dashHeader">
+    <button class="dash-header__toggle" id="sidebarToggle">
+      <span></span><span></span><span></span>
+    </button>
+    <a href="index.html" class="dash-header__logo">SARAL Authority</a>
+    <span></span>
+  </header>
+
+  <!-- MAIN -->
+  <main class="dash-main">
+    <div class="dash-greeting" data-reveal>
+      <div>
+        <h1 class="dash-greeting__title">Reports Archive</h1>
+        <p class="dash-greeting__sub">Historical records of reviewed cases</p>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filter-bar" data-reveal>
+      <div class="filter-bar__search-wrap">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.5"/><path d="M11 11l3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <input type="text" class="filter-bar__search" id="searchPlate" placeholder="Search by plate number, case ID, or location..." />
+      </div>
+      <select class="filter-bar__select" id="filterDecision">
+        <option value="all">All Decisions</option>
+        <option value="approved">Approved</option>
+        <option value="rejected">Rejected</option>
+      </select>
+      <select class="filter-bar__select" id="filterSort">
+        <option value="newest">Newest First</option>
+        <option value="oldest">Oldest First</option>
+        <option value="confidence-high">Confidence: High → Low</option>
+        <option value="confidence-low">Confidence: Low → High</option>
+      </select>
+    </div>
+
+    <!-- Table -->
+    <div class="archive-table-wrap" data-reveal>
+      <table class="archive-table" id="archiveTable">
+        <thead>
+          <tr>
+            <th>Case ID</th>
+            <th>Violation Type</th>
+            <th>Location</th>
+            <th>AI Confidence</th>
+            <th>Decision</th>
+            <th>Reviewed By</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody id="archiveBody">
+          <!-- JS populated -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Result count -->
+    <div style="margin-top: 16px; font-size: 13px; color: var(--gray-400);" id="resultCount" data-reveal></div>
+  </main>
+
+  <!-- Detail Drawer -->
+  <div class="detail-drawer-overlay" id="drawerOverlay"></div>
+  <div class="detail-drawer" id="detailDrawer">
+    <div class="detail-drawer__header">
+      <span class="detail-drawer__title" id="drawerTitle">Case Details</span>
+      <button class="detail-drawer__close" id="drawerClose">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M5 5l8 8M13 5l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="detail-drawer__body" id="drawerBody">
+      <!-- JS populated -->
+    </div>
+  </div>
+
+  <script src="js/store.js"></script>
+  <script src="js/auth.js"></script>
+  <script>SaralAuth.requireAuth('authority');</script>
+  <script src="js/dashboard.js"></script>
+  <script>
+    (function () {
+      'use strict';
+
+      /* ─── ARCHIVE DATA ─── */
+      const archiveData = [
+        { id: 'SARAL-2026-00847', type: 'Signal Jumping', plate: 'KA-01-AB-1234', location: 'MG Road, Bangalore', confidence: 97, decision: 'approved', reviewer: 'Insp. T. Prasad', date: '2026-02-11', time: '14:23', aiModel: 'v3.2.1', evidenceFrames: 4, responseTime: '18 min' },
+        { id: 'SARAL-2026-00846', type: 'Wrong-Way Driving', plate: 'DL-02-CD-5678', location: 'NH-48, Delhi', confidence: 94, decision: 'approved', reviewer: 'Insp. T. Prasad', date: '2026-02-11', time: '11:07', aiModel: 'v3.2.1', evidenceFrames: 6, responseTime: '22 min' },
+        { id: 'SARAL-2026-00845', type: 'Over Speeding', plate: 'MH-12-EF-9012', location: 'Pune-Mumbai Expy', confidence: 88, decision: 'approved', reviewer: 'SI R. Verma', date: '2026-02-11', time: '09:41', aiModel: 'v3.2.1', evidenceFrames: 3, responseTime: '31 min' },
+        { id: 'SARAL-2026-00844', type: 'Illegal Parking', plate: 'KA-05-GH-3456', location: 'Sector 17, Chandigarh', confidence: 91, decision: 'rejected', reviewer: 'Insp. T. Prasad', date: '2026-02-10', time: '19:55', aiModel: 'v3.2.1', evidenceFrames: 2, responseTime: '45 min' },
+        { id: 'SARAL-2026-00843', type: 'No Helmet', plate: 'TS-08-IJ-7890', location: 'Hitech City, Hyderabad', confidence: 96, decision: 'approved', reviewer: 'SI K. Rao', date: '2026-02-10', time: '16:12', aiModel: 'v3.2.0', evidenceFrames: 2, responseTime: '14 min' },
+        { id: 'SARAL-2026-00842', type: 'Lane Violation', plate: 'TN-07-KL-2345', location: 'OMR, Chennai', confidence: 82, decision: 'rejected', reviewer: 'Insp. T. Prasad', date: '2026-02-10', time: '08:30', aiModel: 'v3.2.0', evidenceFrames: 5, responseTime: '28 min' },
+        { id: 'SARAL-2026-00841', type: 'Signal Jumping', plate: 'DL-04-MN-6789', location: 'Connaught Place, Delhi', confidence: 99, decision: 'approved', reviewer: 'SI R. Verma', date: '2026-02-09', time: '21:18', aiModel: 'v3.2.0', evidenceFrames: 4, responseTime: '12 min' },
+        { id: 'SARAL-2026-00840', type: 'Wrong-Way Driving', plate: 'MH-01-OP-3456', location: 'Western Expy, Mumbai', confidence: 91, decision: 'approved', reviewer: 'Insp. T. Prasad', date: '2026-02-09', time: '17:42', aiModel: 'v3.2.0', evidenceFrames: 7, responseTime: '19 min' },
+        { id: 'SARAL-2026-00839', type: 'Over Speeding', plate: 'KA-03-QR-8901', location: 'NICE Road, Bangalore', confidence: 85, decision: 'approved', reviewer: 'SI K. Rao', date: '2026-02-09', time: '06:55', aiModel: 'v3.1.9', evidenceFrames: 3, responseTime: '35 min' },
+        { id: 'SARAL-2026-00838', type: 'Illegal Parking', plate: 'UP-80-ST-1234', location: 'Mall Road, Lucknow', confidence: 78, decision: 'rejected', reviewer: 'Insp. T. Prasad', date: '2026-02-08', time: '13:08', aiModel: 'v3.1.9', evidenceFrames: 2, responseTime: '52 min' },
+        { id: 'SARAL-2026-00837', type: 'Signal Jumping', plate: 'GJ-01-UV-5678', location: 'SG Highway, Ahmedabad', confidence: 93, decision: 'approved', reviewer: 'SI R. Verma', date: '2026-02-08', time: '10:27', aiModel: 'v3.1.9', evidenceFrames: 4, responseTime: '16 min' },
+        { id: 'SARAL-2026-00836', type: 'No Helmet', plate: 'RJ-14-WX-9012', location: 'MI Road, Jaipur', confidence: 97, decision: 'approved', reviewer: 'Insp. T. Prasad', date: '2026-02-08', time: '07:44', aiModel: 'v3.1.9', evidenceFrames: 2, responseTime: '11 min' },
+        { id: 'SARAL-2026-00835', type: 'Lane Violation', plate: 'HR-26-YZ-3456', location: 'NH-44, Gurugram', confidence: 76, decision: 'rejected', reviewer: 'SI K. Rao', date: '2026-02-07', time: '22:31', aiModel: 'v3.1.8', evidenceFrames: 5, responseTime: '41 min' },
+        { id: 'SARAL-2026-00834', type: 'Over Speeding', plate: 'KL-07-AB-7890', location: 'NH-66, Kochi', confidence: 90, decision: 'approved', reviewer: 'Insp. T. Prasad', date: '2026-02-07', time: '15:13', aiModel: 'v3.1.8', evidenceFrames: 3, responseTime: '20 min' },
+        { id: 'SARAL-2026-00833', type: 'Wrong-Way Driving', plate: 'WB-02-CD-1234', location: 'EM Bypass, Kolkata', confidence: 86, decision: 'approved', reviewer: 'SI R. Verma', date: '2026-02-07', time: '11:50', aiModel: 'v3.1.8', evidenceFrames: 6, responseTime: '25 min' },
+      ];
+
+      const tbody = document.getElementById('archiveBody');
+      const resultCount = document.getElementById('resultCount');
+      const searchInput = document.getElementById('searchPlate');
+      const decisionFilter = document.getElementById('filterDecision');
+      const sortFilter = document.getElementById('filterSort');
+
+      function renderTable(data) {
+        tbody.innerHTML = '';
+        data.forEach(row => {
+          const tr = document.createElement('tr');
+          tr.dataset.caseId = row.id;
+          tr.innerHTML = `
+            <td style="font-weight: 600; color: var(--gray-800); font-size: 12px; font-family: var(--font-display);">${row.id}</td>
+            <td>${row.type}</td>
+            <td>${row.location}</td>
+            <td>
+              <span class="confidence-bar"><span class="confidence-bar__fill" style="width: ${row.confidence}%; background: ${row.confidence >= 90 ? 'var(--green-500)' : row.confidence >= 80 ? 'var(--blue-500)' : 'var(--amber-500)'}"></span></span>
+              ${row.confidence}%
+            </td>
+            <td><span class="decision-badge decision-badge--${row.decision}">${row.decision === 'approved' ? '✓ Approved' : '✕ Rejected'}</span></td>
+            <td>${row.reviewer}</td>
+            <td style="color: var(--gray-400);">${row.date}</td>
+          `;
+          tr.addEventListener('click', function () { openDrawer(row); });
+          tbody.appendChild(tr);
+        });
+        resultCount.textContent = data.length + ' of ' + archiveData.length + ' records';
+      }
+
+      function getFilteredData() {
+        let data = [...archiveData];
+
+        // Search
+        const q = searchInput.value.trim().toLowerCase();
+        if (q) {
+          data = data.filter(r =>
+            r.id.toLowerCase().includes(q) ||
+            r.plate.toLowerCase().includes(q) ||
+            r.location.toLowerCase().includes(q) ||
+            r.type.toLowerCase().includes(q)
+          );
+        }
+
+        // Decision filter
+        const dec = decisionFilter.value;
+        if (dec !== 'all') data = data.filter(r => r.decision === dec);
+
+        // Sort
+        const sort = sortFilter.value;
+        if (sort === 'newest') data.sort((a, b) => b.date.localeCompare(a.date) || b.time.localeCompare(a.time));
+        else if (sort === 'oldest') data.sort((a, b) => a.date.localeCompare(b.date) || a.time.localeCompare(b.time));
+        else if (sort === 'confidence-high') data.sort((a, b) => b.confidence - a.confidence);
+        else if (sort === 'confidence-low') data.sort((a, b) => a.confidence - b.confidence);
+
+        return data;
+      }
+
+      function applyFilters() { renderTable(getFilteredData()); }
+
+      searchInput.addEventListener('input', applyFilters);
+      decisionFilter.addEventListener('change', applyFilters);
+      sortFilter.addEventListener('change', applyFilters);
+
+      // Initial render
+      renderTable(archiveData);
+
+      /* ─── DETAIL DRAWER ─── */
+      const overlay = document.getElementById('drawerOverlay');
+      const drawer  = document.getElementById('detailDrawer');
+      const drawerTitle = document.getElementById('drawerTitle');
+      const drawerBody  = document.getElementById('drawerBody');
+      const drawerClose = document.getElementById('drawerClose');
+
+      function openDrawer(row) {
+        drawerTitle.textContent = row.id;
+        drawerBody.innerHTML = `
+          <div class="detail-drawer__row"><span class="detail-drawer__label">Case ID</span><span class="detail-drawer__value">${row.id}</span></div>
+          <div class="detail-drawer__row"><span class="detail-drawer__label">Violation Type</span><span class="detail-drawer__value">${row.type}</span></div>
+          <div class="detail-drawer__row"><span class="detail-drawer__label">Vehicle Plate</span><span class="detail-drawer__value" style="font-family: var(--font-display); font-weight: 700;">${row.plate}</span></div>
+          <div class="detail-drawer__row"><span class="detail-drawer__label">Location</span><span class="detail-drawer__value">${row.location}</span></div>
+          <div class="detail-drawer__row"><span class="detail-drawer__label">AI Confidence</span><span class="detail-drawer__value">${row.confidence}%</span></div>
+          <div class="detail-drawer__row"><span class="detail-drawer__label">Decision</span><span class="detail-drawer__value"><span class="decision-badge decision-badge--${row.decision}">${row.decision === 'approved' ? '✓ Approved' : '✕ Rejected'}</span></span></div>
+          <div class="detail-drawer__row"><span class="detail-drawer__label">Reviewed By</span><span class="detail-drawer__value">${row.reviewer}</span></div>
+          <div class="detail-drawer__row"><span class="detail-drawer__label">Date &amp; Time</span><span class="detail-drawer__value">${row.date} at ${row.time}</span></div>
+          <div class="detail-drawer__row"><span class="detail-drawer__label">Evidence Frames</span><span class="detail-drawer__value">${row.evidenceFrames} frames captured</span></div>
+          <div class="detail-drawer__row"><span class="detail-drawer__label">Response Time</span><span class="detail-drawer__value">${row.responseTime}</span></div>
+          <div class="detail-drawer__row"><span class="detail-drawer__label">AI Model</span><span class="detail-drawer__value"><span class="sys-badge sys-badge--info">${row.aiModel}</span></span></div>
+        `;
+        overlay.classList.add('detail-drawer-overlay--open');
+        drawer.classList.add('detail-drawer--open');
+      }
+
+      function closeDrawer() {
+        overlay.classList.remove('detail-drawer-overlay--open');
+        drawer.classList.remove('detail-drawer--open');
+      }
+
+      drawerClose.addEventListener('click', closeDrawer);
+      overlay.addEventListener('click', closeDrawer);
+      document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeDrawer(); });
+    })();
+  </script>
+</body>
+</html>

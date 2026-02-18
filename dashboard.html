@@ -1,17 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dashboard — SARAL</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet" />
   <link rel="stylesheet" href="css/dashboard.css" />
   <!-- Leaflet.js for real maps -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
+
 <body class="dash-body">
 
   <!-- ═══════ SIDEBAR ═══════ -->
@@ -19,9 +23,15 @@
     <div class="sidebar__top">
       <a href="index.html" class="sidebar__logo">
         <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-          <circle cx="14" cy="14" r="12" stroke="url(#sLogoG)" stroke-width="2.5"/>
-          <path d="M9 14.5L12.5 18L19 11" stroke="url(#sLogoG)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-          <defs><linearGradient id="sLogoG" x1="0" y1="0" x2="28" y2="28"><stop stop-color="#4F8CFF"/><stop offset="1" stop-color="#A78BFA"/></linearGradient></defs>
+          <circle cx="14" cy="14" r="12" stroke="url(#sLogoG)" stroke-width="2.5" />
+          <path d="M9 14.5L12.5 18L19 11" stroke="url(#sLogoG)" stroke-width="2.5" stroke-linecap="round"
+            stroke-linejoin="round" />
+          <defs>
+            <linearGradient id="sLogoG" x1="0" y1="0" x2="28" y2="28">
+              <stop stop-color="#4F8CFF" />
+              <stop offset="1" stop-color="#A78BFA" />
+            </linearGradient>
+          </defs>
         </svg>
         <span>SARAL</span>
       </a>
@@ -29,23 +39,41 @@
 
     <nav class="sidebar__nav">
       <a href="dashboard.html" class="sidebar__link sidebar__link--active">
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="2" width="7" height="7" rx="2" stroke="currentColor" stroke-width="1.5"/><rect x="11" y="2" width="7" height="7" rx="2" stroke="currentColor" stroke-width="1.5"/><rect x="2" y="11" width="7" height="7" rx="2" stroke="currentColor" stroke-width="1.5"/><rect x="11" y="11" width="7" height="7" rx="2" stroke="currentColor" stroke-width="1.5"/></svg>
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <rect x="2" y="2" width="7" height="7" rx="2" stroke="currentColor" stroke-width="1.5" />
+          <rect x="11" y="2" width="7" height="7" rx="2" stroke="currentColor" stroke-width="1.5" />
+          <rect x="2" y="11" width="7" height="7" rx="2" stroke="currentColor" stroke-width="1.5" />
+          <rect x="11" y="11" width="7" height="7" rx="2" stroke="currentColor" stroke-width="1.5" />
+        </svg>
         <span>Overview</span>
       </a>
       <a href="report.html" class="sidebar__link">
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M17 10a7 7 0 11-14 0 7 7 0 0114 0z" stroke="currentColor" stroke-width="1.5"/><path d="M10 7v3l2 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M17 10a7 7 0 11-14 0 7 7 0 0114 0z" stroke="currentColor" stroke-width="1.5" />
+          <path d="M10 7v3l2 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+        </svg>
         <span>New Report</span>
       </a>
       <a href="my-reports.html" class="sidebar__link">
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 6h12M4 10h12M4 14h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M4 6h12M4 10h12M4 14h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+        </svg>
         <span>My Reports</span>
       </a>
       <a href="rewards.html" class="sidebar__link">
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 2l2.09 4.26L17 6.97l-3.5 3.42.83 4.84L10 13.14l-4.33 2.09.83-4.84L3 6.97l4.91-.71L10 2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M10 2l2.09 4.26L17 6.97l-3.5 3.42.83 4.84L10 13.14l-4.33 2.09.83-4.84L3 6.97l4.91-.71L10 2z"
+            stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" />
+        </svg>
         <span>Rewards</span>
       </a>
       <a href="settings.html" class="sidebar__link">
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="3" stroke="currentColor" stroke-width="1.5"/><path d="M10 2v2M10 16v2M2 10h2M16 10h2M4.93 4.93l1.41 1.41M13.66 13.66l1.41 1.41M15.07 4.93l-1.41 1.41M6.34 13.66l-1.41 1.41" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <circle cx="10" cy="10" r="3" stroke="currentColor" stroke-width="1.5" />
+          <path
+            d="M10 2v2M10 16v2M2 10h2M16 10h2M4.93 4.93l1.41 1.41M13.66 13.66l1.41 1.41M15.07 4.93l-1.41 1.41M6.34 13.66l-1.41 1.41"
+            stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+        </svg>
         <span>Settings</span>
       </a>
     </nav>
@@ -57,13 +85,18 @@
       <div class="sidebar__profile-info">
         <span class="sidebar__profile-name">Aarav Kumar</span>
         <span class="sidebar__profile-badge">
-          <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><circle cx="5" cy="5" r="4" fill="#FFD700"/></svg>
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+            <circle cx="5" cy="5" r="4" fill="#FFD700" />
+          </svg>
           Gold Champion
         </span>
       </div>
     </div>
     <button class="sidebar__logout" onclick="SaralAuth.signOut()">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+        <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" stroke-width="1.5"
+          stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
       <span>Logout</span>
     </button>
   </aside>
@@ -75,7 +108,9 @@
     </button>
     <a href="index.html" class="dash-header__logo">SARAL</a>
     <a href="report.html" class="dash-header__action">
-      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 3v12M3 9h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+        <path d="M9 3v12M3 9h12" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+      </svg>
     </a>
   </header>
 
@@ -88,7 +123,9 @@
         <p class="dash-greeting__sub">Your contribution makes roads safer. Keep reporting.</p>
       </div>
       <a href="report.html" class="btn btn--primary btn--glow">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+        </svg>
         <span>New Report</span>
       </a>
     </div>
@@ -97,7 +134,9 @@
     <div class="dash-stats" data-reveal>
       <div class="dash-stat dash-stat--blue">
         <div class="dash-stat__icon">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 16V8M8 16V4M12 16v-5M16 16V9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M4 16V8M8 16V4M12 16v-5M16 16V9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+          </svg>
         </div>
         <div class="dash-stat__info">
           <span class="dash-stat__num" data-count="47">0</span>
@@ -107,7 +146,11 @@
       </div>
       <div class="dash-stat dash-stat--green">
         <div class="dash-stat__icon">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M18 10A8 8 0 112 10a8 8 0 0116 0z" stroke="currentColor" stroke-width="1.5"/><path d="M7 10l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M18 10A8 8 0 112 10a8 8 0 0116 0z" stroke="currentColor" stroke-width="1.5" />
+            <path d="M7 10l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+              stroke-linejoin="round" />
+          </svg>
         </div>
         <div class="dash-stat__info">
           <span class="dash-stat__num" data-count="42">0</span>
@@ -117,7 +160,10 @@
       </div>
       <div class="dash-stat dash-stat--amber">
         <div class="dash-stat__icon">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 2l2.09 4.26L17 6.97l-3.5 3.42.83 4.84L10 13.14l-4.33 2.09.83-4.84L3 6.97l4.91-.71L10 2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M10 2l2.09 4.26L17 6.97l-3.5 3.42.83 4.84L10 13.14l-4.33 2.09.83-4.84L3 6.97l4.91-.71L10 2z"
+              stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" />
+          </svg>
         </div>
         <div class="dash-stat__info">
           <span class="dash-stat__num" data-count="1250">0</span>
@@ -127,7 +173,10 @@
       </div>
       <div class="dash-stat dash-stat--violet">
         <div class="dash-stat__icon">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M3 17V5a2 2 0 012-2h10a2 2 0 012 2v12l-3.5-2L10 17l-3.5-2L3 17z" stroke="currentColor" stroke-width="1.5"/></svg>
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M3 17V5a2 2 0 012-2h10a2 2 0 012 2v12l-3.5-2L10 17l-3.5-2L3 17z" stroke="currentColor"
+              stroke-width="1.5" />
+          </svg>
         </div>
         <div class="dash-stat__info">
           <span class="dash-stat__num" data-count="3">0</span>
@@ -184,7 +233,9 @@
         <div class="dash-reports">
           <div class="dash-report">
             <div class="dash-report__icon dash-report__icon--red">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v5M8 11h.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M8 3v5M8 11h.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+              </svg>
             </div>
             <div class="dash-report__info">
               <span class="dash-report__title">Signal Violation — MG Road</span>
@@ -194,7 +245,9 @@
           </div>
           <div class="dash-report">
             <div class="dash-report__icon dash-report__icon--amber">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v5M8 11h.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M8 3v5M8 11h.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+              </svg>
             </div>
             <div class="dash-report__info">
               <span class="dash-report__title">Wrong-Way Driving — NH48</span>
@@ -204,7 +257,10 @@
           </div>
           <div class="dash-report">
             <div class="dash-report__icon dash-report__icon--green">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M5 8l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M5 8l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                  stroke-linejoin="round" />
+              </svg>
             </div>
             <div class="dash-report__info">
               <span class="dash-report__title">Parking Violation — Sector 17</span>
@@ -214,7 +270,10 @@
           </div>
           <div class="dash-report">
             <div class="dash-report__icon dash-report__icon--green">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M5 8l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M5 8l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                  stroke-linejoin="round" />
+              </svg>
             </div>
             <div class="dash-report__info">
               <span class="dash-report__title">Over Speeding — Ring Road</span>
@@ -233,13 +292,13 @@
         <div class="dash-karma">
           <div class="dash-karma__circle">
             <svg viewBox="0 0 120 120">
-              <circle cx="60" cy="60" r="52" fill="none" stroke="var(--gray-100)" stroke-width="8"/>
-              <circle cx="60" cy="60" r="52" fill="none" stroke="url(#karmaGrad)" stroke-width="8" stroke-linecap="round"
-                stroke-dasharray="326.73" stroke-dashoffset="82" transform="rotate(-90 60 60)"/>
+              <circle cx="60" cy="60" r="52" fill="none" stroke="var(--gray-100)" stroke-width="8" />
+              <circle cx="60" cy="60" r="52" fill="none" stroke="url(#karmaGrad)" stroke-width="8"
+                stroke-linecap="round" stroke-dasharray="326.73" stroke-dashoffset="82" transform="rotate(-90 60 60)" />
               <defs>
                 <linearGradient id="karmaGrad" x1="0" y1="0" x2="120" y2="120">
-                  <stop stop-color="#4F8CFF"/>
-                  <stop offset="1" stop-color="#A78BFA"/>
+                  <stop stop-color="#4F8CFF" />
+                  <stop offset="1" stop-color="#A78BFA" />
                 </linearGradient>
               </defs>
             </svg>
@@ -283,7 +342,7 @@
   <script src="js/dashboard.js"></script>
   <script>
     // Load real data from API
-    (async function() {
+    (async function () {
       const userId = SaralAuth.getUserId();
       if (!userId) return;
 
@@ -306,7 +365,8 @@
         const profileBadge = document.querySelector('.sidebar__profile-badge');
         if (profileName) profileName.textContent = user.name;
         if (profileAvatar) profileAvatar.textContent = state.user.initials;
-        if (profileBadge) profileBadge.innerHTML = `<svg width="10" height="10" viewBox="0 0 10 10" fill="none"><circle cx="5" cy="5" r="4" fill="#FFD700"/></svg> ${state.user.tier} Champion`;
+        // Tier is computed from LIVE karma below — placeholder for now
+        if (profileBadge) profileBadge.dataset.updateTier = '1';
 
         // Fetch stats from API
         const stats = await SaralAPI.getUserStats(userId);
@@ -324,30 +384,27 @@
           verifiedTrend[1].textContent = Math.round(stats.approved / stats.total * 100) + '%';
         }
 
-        // Update tier badge
-        const tierBadge = document.querySelector('.dash-stat__badge');
-        if (tierBadge) tierBadge.textContent = state.user.tier;
+        // ── Compute tier from LIVE karma ────────────────────────────────
+        const { current: currentTier, next: nextTier, TIERS: tiers } = SaralStore.getTierInfo(stats.karma_points);
 
-        // Update karma circle
+        // Update sidebar badge with correct live tier
+        if (profileBadge) {
+          profileBadge.innerHTML = `<svg width="10" height="10" viewBox="0 0 10 10" fill="none"><circle cx="5" cy="5" r="4" fill="${currentTier.color}"/></svg> ${currentTier.icon} ${currentTier.name} Champion`;
+        }
+
+        // Update stat card tier badge
+        const tierBadge = document.querySelector('.dash-stat__badge');
+        if (tierBadge) tierBadge.textContent = currentTier.name;
+
+        // Update karma circle number
         const karmaNum = document.querySelector('.dash-karma__num');
         if (karmaNum) karmaNum.textContent = stats.karma_points.toLocaleString();
 
-        // Update tier display
-        const tiers = [
-          { name: 'Bronze', min: 0, max: 500 },
-          { name: 'Silver', min: 500, max: 1000 },
-          { name: 'Gold', min: 1000, max: 1500 },
-          { name: 'Platinum', min: 1500, max: 2500 },
-          { name: 'Diamond', min: 2500, max: Infinity },
-        ];
-        let currentTier = tiers[0], nextTier = tiers[1];
-        for (let i = 0; i < tiers.length; i++) {
-          if (stats.karma_points >= tiers[i].min) { currentTier = tiers[i]; nextTier = tiers[i+1] || null; }
-        }
+        // Update karma circle next-tier label
         const karmaOf = document.querySelector('.dash-karma__of');
-        if (karmaOf && nextTier) karmaOf.textContent = `/ ${nextTier.min.toLocaleString()}`;
+        if (karmaOf) karmaOf.textContent = nextTier ? `/ ${nextTier.min.toLocaleString()}` : '/ MAX';
 
-        // Karma circle progress
+        // Karma circle progress arc
         const karmaCircle = document.querySelector('.dash-karma__circle circle:nth-child(2)');
         if (karmaCircle && nextTier) {
           const progress = (stats.karma_points - currentTier.min) / (nextTier.min - currentTier.min);
@@ -360,10 +417,10 @@
         tierEls.forEach(el => {
           const tierName = el.textContent.trim();
           const tierIdx = tiers.findIndex(t => t.name === tierName);
-          const currentIdx = tiers.findIndex(t => t.name === currentTier.name);
+          const curIdx = tiers.findIndex(t => t.name === currentTier.name);
           el.classList.remove('dash-karma__tier--done', 'dash-karma__tier--current');
-          if (tierIdx < currentIdx) el.classList.add('dash-karma__tier--done');
-          if (tierIdx === currentIdx) el.classList.add('dash-karma__tier--current');
+          if (tierIdx < curIdx) el.classList.add('dash-karma__tier--done');
+          if (tierIdx === curIdx) el.classList.add('dash-karma__tier--current');
         });
 
         // Fetch and render recent reports
@@ -437,4 +494,5 @@
     })();
   </script>
 </body>
+
 </html>

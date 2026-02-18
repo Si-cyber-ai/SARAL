@@ -56,9 +56,22 @@
     const displayName = document.getElementById('profileDisplayName');
     const profileInitials = document.getElementById('profileInitials');
     const profileTier = document.getElementById('profileTier');
+    const profileBadge = document.querySelector('.sidebar__profile-badge');
     if (displayName) displayName.textContent = s.user.name;
     if (profileInitials) profileInitials.textContent = s.user.initials;
-    if (profileTier) profileTier.textContent = (s.user.tier || 'Bronze') + ' Champion';
+
+    // Fetch live karma and compute correct tier
+    try {
+      const userId = SaralAuth.getUserId();
+      const stats = await SaralAPI.getUserStats(userId);
+      const { current } = SaralStore.getTierInfo(stats.karma_points);
+      if (profileTier) profileTier.textContent = current.name + ' Champion';
+      if (profileBadge) profileBadge.innerHTML =
+        `<svg width="10" height="10" viewBox="0 0 10 10" fill="none"><circle cx="5" cy="5" r="4" fill="${current.color}"/></svg> ${current.icon} ${current.name} Champion`;
+    } catch (_) {
+      // Fallback to cached tier
+      if (profileTier) profileTier.textContent = (s.user.tier || 'Bronze') + ' Champion';
+    }
   }
 
   loadProfile();

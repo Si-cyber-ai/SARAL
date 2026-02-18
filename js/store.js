@@ -59,12 +59,27 @@ const SaralStore = (() => {
     return out;
   }
 
+  const TIERS = [
+    { name: 'Bronze', min: 0, max: 500, color: '#cd7f32', icon: '🥉' },
+    { name: 'Silver', min: 500, max: 1000, color: '#94a3b8', icon: '🥈' },
+    { name: 'Gold', min: 1000, max: 1500, color: '#FFD700', icon: '🥇' },
+    { name: 'Platinum', min: 1500, max: 2500, color: '#a78bfa', icon: '💎' },
+    { name: 'Diamond', min: 2500, max: Infinity, color: '#38bdf8', icon: '💠' },
+  ];
+
   function computeTier(points) {
-    if (points >= 2500) return 'Diamond';
-    if (points >= 1500) return 'Platinum';
-    if (points >= 1000) return 'Gold';
-    if (points >= 500) return 'Silver';
+    for (let i = TIERS.length - 1; i >= 0; i--) {
+      if (points >= TIERS[i].min) return TIERS[i].name;
+    }
     return 'Bronze';
+  }
+
+  function getTierInfo(points) {
+    let current = TIERS[0], next = TIERS[1];
+    for (let i = 0; i < TIERS.length; i++) {
+      if (points >= TIERS[i].min) { current = TIERS[i]; next = TIERS[i + 1] || null; }
+    }
+    return { current, next, TIERS };
   }
 
   function computeInitials(name) {
@@ -105,24 +120,39 @@ const SaralStore = (() => {
       save(state);
     },
     syncReports: (reports) => {
-      state.reports = reports.map(r => ({
-        id: r.id,
-        type: r.violation_type,
-        plate: r.plate_number || '',
-        location: r.location || '',
-        date: r.created_at,
-        confidence: r.confidence || 0,
-        status: r.status === 'Under Review' ? 'pending'
-              : r.status === 'Approved' ? 'verified'
+      state.reports = reports.map(r => {
+        // Parse distance_px from description for parking reports
+        // (stored as "distance:342" by the backend)
+        let distance_px = null;
+        if (r.source === 'parking' && r.description) {
+          const m = r.description.match(/^distance:(\d+)$/);
+          if (m) distance_px = parseInt(m[1], 10);
+        }
+        return {
+          id: r.id,
+          type: r.violation_type,
+          plate: r.plate_number || '',
+          location: r.location || '',
+          date: r.created_at,
+          confidence: r.confidence || 0,
+          status: r.status === 'Under Review' ? 'pending'
+            : r.status === 'Approved' ? 'verified'
               : r.status === 'Rejected' ? 'rejected'
-              : r.status === 'Auto-Rejected' ? 'Auto-Rejected' : 'pending',
-        points: r.status === 'Approved' ? 150 : 0,
-        thumbnail: r.media_url || null,
-        description: r.description || '',
-        helmet_detected: r.helmet_detected || '',
-      }));
+                : r.status === 'Auto-Rejected' ? 'Auto-Rejected' : 'pending',
+          points: r.status === 'Approved' ? 150 : 0,
+          thumbnail: r.media_url || null,
+          description: r.description || '',
+          helmet_detected: r.helmet_detected || '',
+          // ── New fields ──
+          fine_amount: r.fine_amount || '',
+          source: r.source || 'helmet_plate',
+          vehicle_type: r.vehicle_type || '',
+          distance_px: distance_px,
+        };
+      });
       save(state);
     },
+    getTierInfo,
   };
 })();
 

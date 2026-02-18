@@ -1,8 +1,31 @@
+# ── Backend / API ─────────────────────────────────────────────────────────────
 fastapi>=0.100.0
 uvicorn>=0.22.0
 python-multipart>=0.0.6
-inference-sdk>=0.9.0
+
+# ── model.py  (helmet + plate detection via Roboflow) ─────────────────────────
+inference-sdk
+
+# ── model2.py  (parking violation detection) ──────────────────────────────────
+# YOLOv8 — vehicle detection (auto-downloads yolov8n.pt ~6 MB on first run)
+ultralytics>=8.0.0
+
+# PyTorch — required by both ultralytics and EasyOCR
+# CPU build (no GPU):
+#   pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+# CUDA build (NVIDIA GPU, replace cu121 with your CUDA version):
+#   pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
+torch>=2.0.0
+torchvision>=0.15.0
+
+# OCR — license plate reading (shared by model.py and model2.py)
 easyocr>=1.7.0
-opencv-python>=4.8.0
-matplotlib>=3.7.0
+
+# Image processing
+# opencv-python-headless is the server-safe build (no GUI/display dependencies)
+opencv-python-headless>=4.8.0
 numpy>=1.24.0
+Pillow>=9.0.0
+
+# Plotting (used by model.py for annotation)
+matplotlib>=3.7.0

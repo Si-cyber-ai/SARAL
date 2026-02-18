@@ -42,15 +42,19 @@ def init_db():
             plate_number   TEXT    DEFAULT '',
             manual_plate   TEXT    DEFAULT '',
             violation_type TEXT    NOT NULL,
-            confidence     REAL   DEFAULT 0.0,
-            media_url      TEXT   DEFAULT '',
-            annotated_url  TEXT   DEFAULT '',
-            location       TEXT   DEFAULT '',
-            description    TEXT   DEFAULT '',
-            status         TEXT   NOT NULL DEFAULT 'Under Review'
+            confidence     REAL    DEFAULT 0.0,
+            media_url      TEXT    DEFAULT '',
+            annotated_url  TEXT    DEFAULT '',
+            location       TEXT    DEFAULT '',
+            description    TEXT    DEFAULT '',
+            status         TEXT    NOT NULL DEFAULT 'Under Review'
                            CHECK(status IN ('Under Review', 'Approved', 'Rejected', 'Auto-Rejected')),
-            helmet_detected TEXT  DEFAULT '',
-            created_at     TEXT   DEFAULT (datetime('now')),
+            helmet_detected TEXT   DEFAULT '',
+            fine_amount    TEXT    DEFAULT '',
+            source         TEXT    DEFAULT 'helmet_plate'
+                           CHECK(source IN ('helmet_plate', 'parking')),
+            vehicle_type   TEXT    DEFAULT '',
+            created_at     TEXT    DEFAULT (datetime('now')),
             FOREIGN KEY (user_id) REFERENCES users(id)
         );
 
@@ -89,6 +93,29 @@ def init_db():
         cursor.execute("SELECT manual_plate FROM reports LIMIT 1")
     except sqlite3.OperationalError:
         cursor.execute("ALTER TABLE reports ADD COLUMN manual_plate TEXT DEFAULT ''")
+        conn.commit()
+
+    # Migration: add fine_amount column if missing (for existing DBs)
+    try:
+        cursor.execute("SELECT fine_amount FROM reports LIMIT 1")
+    except sqlite3.OperationalError:
+        cursor.execute("ALTER TABLE reports ADD COLUMN fine_amount TEXT DEFAULT ''")
+        conn.commit()
+
+    # Migration: add source column if missing (for existing DBs)
+    try:
+        cursor.execute("SELECT source FROM reports LIMIT 1")
+    except sqlite3.OperationalError:
+        # SQLite does not support CHECK constraints in ALTER TABLE;
+        # the constraint is enforced by application logic for migrated rows.
+        cursor.execute("ALTER TABLE reports ADD COLUMN source TEXT DEFAULT 'helmet_plate'")
+        conn.commit()
+
+    # Migration: add vehicle_type column if missing (for existing DBs)
+    try:
+        cursor.execute("SELECT vehicle_type FROM reports LIMIT 1")
+    except sqlite3.OperationalError:
+        cursor.execute("ALTER TABLE reports ADD COLUMN vehicle_type TEXT DEFAULT ''")
         conn.commit()
 
     conn.close()
@@ -154,21 +181,99 @@ def create_report(
     location: str = "",
     description: str = "",
     helmet_detected: str = "",
-    status: str = "Pending",
+    status: str = "Under Review",
     manual_plate: str = "",
+    fine_amount: str = "",
+    source: str = "helmet_plate",
+    vehicle_type: str = "",
 ) -> Dict[str, Any]:
+    """
+    Insert a new report row and return it as a dict.
+
+    Works for both helmet/plate reports (source='helmet_plate') and
+    parking-violation reports (source='parking').
+    """
     conn = get_db()
     cursor = conn.execute(
-        """INSERT INTO reports (user_id, plate_number, violation_type, confidence,
-           media_url, annotated_url, location, description, helmet_detected, status, manual_plate)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-        (user_id, plate_number, violation_type, confidence, media_url, annotated_url, location, description, helmet_detected, status, manual_plate),
+        """INSERT INTO reports
+               (user_id, plate_number, violation_type, confidence,
+                media_url, annotated_url, location, description,
+                helmet_detected, status, manual_plate, fine_amount, source, vehicle_type)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+        (
+            user_id, plate_number, violation_type, confidence,
+            media_url, annotated_url, location, description,
+            helmet_detected, status, manual_plate, fine_amount, source, vehicle_type,
+        ),
     )
     conn.commit()
     report_id = cursor.lastrowid
     row = conn.execute("SELECT * FROM reports WHERE id = ?", (report_id,)).fetchone()
     conn.close()
     return dict(row)
+
+
+def create_parking_violation_report(
+    user_id: int,
+    plate_number: str,
+    violation_type: str,
+    fine_amount: str,
+    confidence: float,
+    vehicle_type: str = "",
+    media_url: str = "",
+    annotated_url: str = "",
+    location: str = "",
+    description: str = "",
+) -> Dict[str, Any]:
+    """
+    Convenience wrapper that stores a single parking violation using the
+    same `reports` table as helmet violations.
+
+    Differences from a helmet report:
+      • source       = 'parking'      (distinguishes it in queries)
+      • fine_amount  = the fine string from model2 (e.g. '₹500')
+      • vehicle_type = vehicle label from YOLO (e.g. 'Car', 'Motorcycle')
+      • status       = 'Under Review' (consistent with the rest of the system)
+      • helmet_detected is left blank (not applicable)
+      • manual_plate    is left blank (OCR plate is stored in plate_number)
+    """
+    return create_report(
+        user_id=user_id,
+        plate_number=plate_number,
+        violation_type=violation_type,
+        confidence=confidence,
+        media_url=media_url,
+        annotated_url=annotated_url,
+        location=location,
+        description=description,
+        helmet_detected="",
+        status="Under Review",
+        manual_plate="",
+        fine_amount=fine_amount,
+        source="parking",
+        vehicle_type=vehicle_type,
+    )
+
+
+def get_parking_violation_reports(
+    user_id: Optional[int] = None,
+) -> List[Dict[str, Any]]:
+    """
+    Return all parking-violation reports, optionally filtered by user.
+    Results are ordered newest-first.
+    """
+    conn = get_db()
+    if user_id is not None:
+        rows = conn.execute(
+            "SELECT * FROM reports WHERE source = 'parking' AND user_id = ? ORDER BY created_at DESC",
+            (user_id,),
+        ).fetchall()
+    else:
+        rows = conn.execute(
+            "SELECT * FROM reports WHERE source = 'parking' ORDER BY created_at DESC"
+        ).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
 
 
 def get_reports_by_user(user_id: int) -> List[Dict[str, Any]]:
@@ -183,8 +288,14 @@ def get_reports_by_user(user_id: int) -> List[Dict[str, Any]]:
 def get_pending_reports() -> List[Dict[str, Any]]:
     conn = get_db()
     rows = conn.execute(
-        """SELECT r.*, u.name as reporter_name, u.email as reporter_email
-           FROM reports r JOIN users u ON r.user_id = u.id
+        """SELECT r.id, r.user_id, r.plate_number, r.manual_plate,
+                  r.violation_type, r.confidence, r.media_url, r.annotated_url,
+                  r.location, r.description, r.status, r.helmet_detected,
+                  r.fine_amount, r.source, r.vehicle_type, r.created_at,
+                  u.name  AS reporter_name,
+                  u.email AS reporter_email
+           FROM reports r
+           JOIN users u ON r.user_id = u.id
            WHERE r.status = 'Under Review'
            ORDER BY r.created_at DESC"""
     ).fetchall()
@@ -195,8 +306,13 @@ def get_pending_reports() -> List[Dict[str, Any]]:
 def get_all_reports() -> List[Dict[str, Any]]:
     conn = get_db()
     rows = conn.execute(
-        """SELECT r.*, u.name as reporter_name
-           FROM reports r JOIN users u ON r.user_id = u.id
+        """SELECT r.id, r.user_id, r.plate_number, r.manual_plate,
+                  r.violation_type, r.confidence, r.media_url, r.annotated_url,
+                  r.location, r.description, r.status, r.helmet_detected,
+                  r.fine_amount, r.source, r.vehicle_type, r.created_at,
+                  u.name AS reporter_name
+           FROM reports r
+           JOIN users u ON r.user_id = u.id
            ORDER BY r.created_at DESC"""
     ).fetchall()
     conn.close()

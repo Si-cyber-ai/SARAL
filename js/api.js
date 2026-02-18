@@ -97,6 +97,11 @@ const SaralAPI = (() => {
       return request(`/api/reports/${reportId}`);
     },
 
+    getParkingReports(userId) {
+      const qs = userId ? `?user_id=${userId}` : '';
+      return request(`/api/reports/parking${qs}`);
+    },
+
     updateManualPlate(reportId, manualPlate) {
       const fd = new FormData();
       fd.append('manual_plate', manualPlate);

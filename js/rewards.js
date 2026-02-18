@@ -36,22 +36,7 @@
     const pts = points !== undefined ? points : state.user.points;
     animateNumber(document.getElementById('pointsBalance'), pts);
 
-    const tiers = [
-      { name: 'Bronze',   min: 0,    max: 500 },
-      { name: 'Silver',   min: 500,  max: 1000 },
-      { name: 'Gold',     min: 1000, max: 1500 },
-      { name: 'Platinum', min: 1500, max: 2500 },
-      { name: 'Diamond',  min: 2500, max: Infinity },
-    ];
-
-    let current = tiers[0];
-    let next = tiers[1];
-    for (let i = 0; i < tiers.length; i++) {
-      if (pts >= tiers[i].min) {
-        current = tiers[i];
-        next = tiers[i + 1] || null;
-      }
-    }
+    const { current, next } = SaralStore.getTierInfo(pts);
 
     const tierNameEl = document.getElementById('tierName');
     const tierBadge = document.getElementById('tierBadge');
@@ -221,7 +206,14 @@
     // Refresh user data from API
     await SaralAuth.refreshUser();
     const user = SaralAuth.getUser();
-    const pts = SaralStore.get().user.points;
+
+    // Fetch live karma from API
+    let pts = SaralStore.get().user.points;
+    try {
+      const userId = SaralAuth.getUserId();
+      const stats = await SaralAPI.getUserStats(userId);
+      pts = stats.karma_points;
+    } catch (_) { /* use cached */ }
 
     // Load catalogue, then render
     await loadCatalogue();
@@ -230,11 +222,16 @@
     renderCatalogue(pts);
     loadHistory();
 
-    // Update sidebar profile
+    // Update sidebar profile with live tier
     const profileName = document.querySelector('.sidebar__profile-name');
     const profileAvatar = document.querySelector('.sidebar__profile-avatar span');
+    const profileBadge = document.querySelector('.sidebar__profile-badge');
     if (profileName) profileName.textContent = user.name;
     if (profileAvatar) profileAvatar.textContent = SaralStore.get().user.initials;
+    if (profileBadge) {
+      const { current } = SaralStore.getTierInfo(pts);
+      profileBadge.innerHTML = `<svg width="10" height="10" viewBox="0 0 10 10" fill="none"><circle cx="5" cy="5" r="4" fill="${current.color}"/></svg> ${current.icon} ${current.name} Champion`;
+    }
   }
 
   init();

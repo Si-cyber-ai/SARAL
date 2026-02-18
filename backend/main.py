@@ -3,12 +3,13 @@ SARAL — FastAPI Backend
 Serves the AI detection pipeline, report management, auth, and karma system.
 """
 
+import asyncio
 import os
 import sys
 import uuid
 import shutil
 from datetime import datetime
-from typing import Optional
+from typing import Any, Dict, List, Optional
 
 from fastapi import FastAPI, File, UploadFile, Form, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
@@ -26,14 +27,22 @@ import database as db
 # ─── Initialise the database (create tables + seed users) ───
 db.init_db()
 
-# ─── Try importing the AI model (graceful fallback if deps missing) ───
+# ─── Try importing the plate/helmet AI model (graceful fallback if deps missing) ───
 try:
     from models.model import process_image, process_video, get_input_type, save_annotated_image
     AI_MODEL_AVAILABLE = True
 except ImportError as e:
-    print(f"[WARNING] AI model not available: {e}")
+    print(f"[WARNING] AI model (plate/helmet) not available: {e}")
     print("[WARNING] The API will work but /api/analyze will return mock results.")
     AI_MODEL_AVAILABLE = False
+
+# ─── Try importing the parking detection model (graceful fallback) ───
+try:
+    from models.model2 import detect_parking_violation
+    PARKING_MODEL_AVAILABLE = True
+except ImportError as e:
+    print(f"[WARNING] Parking detection model not available: {e}")
+    PARKING_MODEL_AVAILABLE = False
 
 # ─── App Setup ───
 app = FastAPI(title="SARAL API", version="1.0.0")
@@ -57,7 +66,8 @@ app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
 FRONTEND_DIR = PROJECT_ROOT
 app.mount("/static", StaticFiles(directory=FRONTEND_DIR), name="frontend")
 
-KARMA_POINTS_PER_APPROVAL = 150
+KARMA_POINTS_PER_APPROVAL         = 150   # helmet / plate violations
+KARMA_POINTS_PER_PARKING_APPROVAL = 150   # parking violations (same civic contribution)
 
 
 # ===========================================================================
@@ -154,14 +164,18 @@ async def analyze(
     manual_plate: str = Form(""),
 ):
     """
-    Accept image/video upload, run AI model, store report, return result.
+    Accept image/video upload, run BOTH the plate/helmet AI pipeline and the
+    parking-violation pipeline concurrently, merge results, store report, and
+    return a combined response.
     """
-    # Validate user exists
+    import re as _re
+
+    # ── Validate user ────────────────────────────────────────────────────────
     user = db.get_user_by_id(user_id)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 
-    # Save uploaded file
+    # ── Save uploaded file ───────────────────────────────────────────────────
     ext = os.path.splitext(file.filename)[1].lower() if file.filename else ".jpg"
     unique_name = f"{uuid.uuid4().hex}{ext}"
     file_path = os.path.join(UPLOAD_DIR, unique_name)
@@ -171,105 +185,202 @@ async def analyze(
 
     media_url = f"/uploads/{unique_name}"
 
-    # Run AI model
-    plate_number = ""
-    confidence = 0.0
-    detected_violation = violation_type
-    helmet_info = ""
-    annotated_url = ""
-    ai_results = None  # keep raw results for annotated image generation
+    # =========================================================================
+    # CONCURRENT AI DETECTION
+    # Both pipelines are CPU-bound; run them in the default thread-pool so the
+    # FastAPI event loop stays responsive while they execute in parallel.
+    # =========================================================================
 
-    if AI_MODEL_AVAILABLE:
+    # ── Helper: plate/helmet pipeline (unchanged logic) ──────────────────────
+    def _run_helmet_plate() -> Dict[str, Any]:
+        """Run the plate + helmet detection pipeline. Returns a result dict."""
+        out: Dict[str, Any] = {
+            "plate_number": "",
+            "confidence": 0.0,
+            "helmet_info": "",
+            "annotated_url": "",
+            "detected_violation": violation_type,
+            "ai_results": None,
+        }
+        if not AI_MODEL_AVAILABLE:
+            # Mock result when model is not available
+            out["plate_number"] = "KL 11 AB 1234"
+            out["confidence"] = 0.91
+            if not out["detected_violation"]:
+                out["detected_violation"] = "Traffic Violation"
+            return out
+
         try:
             input_type = get_input_type(file_path)
-
             if input_type == "image":
                 results = process_image(file_path, show_visual=False)
             else:
                 result = process_video(file_path, num_frames=10)
                 results = [result] if result else []
 
-            if results and len(results) > 0:
-                ai_results = results
+            if results:
+                out["ai_results"] = results
                 best = results[0]
-                plate_number = best.get("plate_text", "")
-                confidence = best.get("avg_confidence", 0.0)
+                out["plate_number"] = best.get("plate_text", "")
+                out["confidence"]   = best.get("avg_confidence", 0.0)
 
-                # Check for helmet detections
+                # ── Helmet logic (preserved exactly) ────────────────────────
                 helmet_dets = best.get("helmet_detections", [])
-                no_helmet = [h for h in helmet_dets if "no" in h.get("class", "").lower() or "without" in h.get("class", "").lower()]
+                no_helmet   = [
+                    h for h in helmet_dets
+                    if "no" in h.get("class", "").lower()
+                    or "without" in h.get("class", "").lower()
+                ]
                 with_helmet = [h for h in helmet_dets if h not in no_helmet]
 
-                if no_helmet and not detected_violation:
-                    detected_violation = "No Helmet"
-                elif not detected_violation and plate_number:
-                    detected_violation = "Traffic Violation"
+                if no_helmet and not out["detected_violation"]:
+                    out["detected_violation"] = "No Helmet"
+                elif not out["detected_violation"] and out["plate_number"]:
+                    out["detected_violation"] = "Traffic Violation"
 
                 if helmet_dets:
-                    helmet_info = f"{len(with_helmet)} with helmet, {len(no_helmet)} without"
+                    out["helmet_info"] = (
+                        f"{len(with_helmet)} with helmet, {len(no_helmet)} without"
+                    )
 
-                # Use YOLO confidence if OCR confidence is 0
-                if confidence == 0.0 and best.get("yolo_confidence", 0) > 0:
-                    confidence = best["yolo_confidence"]
+                # Fallback confidence from YOLO or helmet detections
+                if out["confidence"] == 0.0 and best.get("yolo_confidence", 0) > 0:
+                    out["confidence"] = best["yolo_confidence"]
+                if out["confidence"] == 0.0 and helmet_dets:
+                    best_hc = max(h.get("confidence", 0.0) for h in helmet_dets)
+                    if best_hc > 0:
+                        out["confidence"] = best_hc
 
-                # If plate confidence is still 0 but helmet was detected, use helmet confidence
-                if confidence == 0.0 and helmet_dets:
-                    best_helmet_conf = max(h.get("confidence", 0.0) for h in helmet_dets)
-                    if best_helmet_conf > 0:
-                        confidence = best_helmet_conf
-
-                # Generate annotated image with bounding boxes
+                # ── Annotated image ──────────────────────────────────────────
                 try:
                     image_rgb = best.get("image_rgb")
                     if image_rgb is not None:
-                        annotated_name = f"annotated_{uuid.uuid4().hex}.png"
-                        annotated_path = os.path.join(UPLOAD_DIR, annotated_name)
-                        save_annotated_image(image_rgb, results, annotated_path)
-                        annotated_url = f"/uploads/{annotated_name}"
+                        ann_name = f"annotated_{uuid.uuid4().hex}.png"
+                        ann_path = os.path.join(UPLOAD_DIR, ann_name)
+                        save_annotated_image(image_rgb, results, ann_path)
+                        out["annotated_url"] = f"/uploads/{ann_name}"
                 except Exception as ae:
                     print(f"[WARNING] Failed to save annotated image: {ae}")
 
         except Exception as e:
-            print(f"[ERROR] AI model failed: {e}")
-            # Continue with empty results — report still gets created
-    else:
-        # Mock result when model is not available
-        plate_number = "KL 11 AB 1234"
-        confidence = 0.91
-        if not detected_violation:
-            detected_violation = "Traffic Violation"
+            print(f"[ERROR] Plate/helmet model failed: {e}")
 
+        return out
+
+    # ── Helper: parking detection pipeline ───────────────────────────────────
+    def _run_parking() -> Dict[str, Any]:
+        """Run the parking-violation detection pipeline. Returns model2 output."""
+        if not PARKING_MODEL_AVAILABLE:
+            return {"violations": [], "vehicle_count": 0, "sign_detected": False}
+        try:
+            # Generate a unique path for the annotated parking image
+            ann_name = f"parking_annotated_{uuid.uuid4().hex}.jpg"
+            ann_path = os.path.join(UPLOAD_DIR, ann_name)
+            result = detect_parking_violation(file_path, output_path=ann_path)
+            # Attach the web-accessible URL so the caller can use it
+            if result.get("annotated_path"):
+                result["annotated_url"] = f"/uploads/{ann_name}"
+            return result
+        except Exception as e:
+            print(f"[ERROR] Parking detection model failed: {e}")
+            return {"violations": [], "vehicle_count": 0, "sign_detected": False}
+
+    # ── Run both pipelines concurrently ──────────────────────────────────────
+    helmet_plate_result, parking_result = await asyncio.gather(
+        asyncio.to_thread(_run_helmet_plate),
+        asyncio.to_thread(_run_parking),
+    )
+
+    # =========================================================================
+    # MERGE RESULTS
+    # =========================================================================
+
+    # ── Unpack helmet/plate results ──────────────────────────────────────────
+    plate_number       = helmet_plate_result["plate_number"]
+    confidence         = helmet_plate_result["confidence"]
+    detected_violation = helmet_plate_result["detected_violation"]
+    helmet_info        = helmet_plate_result["helmet_info"]
+    annotated_url      = helmet_plate_result["annotated_url"]
+
+    # ── Unpack parking results ───────────────────────────────────────────────
+    parking_violations: List[Dict[str, Any]] = parking_result.get("violations", [])
+    vehicle_count: int  = parking_result.get("vehicle_count", 0)
+    sign_detected: bool = parking_result.get("sign_detected", False)
+    parking_annotated_url: str = parking_result.get("annotated_url", "")
+
+    # ── Use parking annotated image when no helmet image was produced ─────────
+    # (parking-only upload: helmet model found nothing, so annotated_url is empty)
+    if not annotated_url and parking_annotated_url:
+        annotated_url = parking_annotated_url
+
+    # ── Build unified violations list ────────────────────────────────────────
+    # Each entry carries a "source" tag so the frontend can distinguish them.
+    combined_violations: List[Dict[str, Any]] = []
+
+    # Helmet/plate violations
+    if detected_violation and detected_violation not in ("", "Unknown Violation"):
+        combined_violations.append({
+            "source"    : "helmet_plate",
+            "type"      : detected_violation,
+            "plate"     : plate_number,
+            "confidence": round(confidence, 4),
+            "helmet_info": helmet_info,
+        })
+
+    # Parking violations (each entry already has type/vehicle/plate/distance/fine/confidence)
+    for pv in parking_violations:
+        combined_violations.append({
+            "source"    : "parking",
+            **pv,
+        })
+
+    # ── Determine primary violation type for the report ──────────────────────
+    # Priority: parking violation > helmet/plate violation > fallback
+    if parking_violations and not detected_violation:
+        detected_violation = parking_violations[0].get("type", "Illegal Parking")
+    elif parking_violations:
+        # Both detected — keep the existing violation type but note parking too
+        detected_violation = detected_violation  # already set
     if not detected_violation:
         detected_violation = "Unknown Violation"
 
-    # Normalize confidence to percentage (0-100)
+    # ── If parking gave us a better plate, use it ────────────────────────────
+    if not plate_number and parking_violations:
+        first_pv_plate = parking_violations[0].get("plate", "")
+        if first_pv_plate and first_pv_plate != "UNREADABLE":
+            plate_number = first_pv_plate
+
+    # ── If parking gave us a better confidence, use it ───────────────────────
+    if parking_violations and confidence == 0.0:
+        confidence = parking_violations[0].get("confidence", 0.0)
+
+    # ── Normalise confidence to percentage (0-100) ───────────────────────────
     confidence_pct = round(confidence * 100, 1) if confidence <= 1.0 else round(confidence, 1)
 
-    # ─── Plate match verification ───
-    import re as _re
+    # =========================================================================
+    # PLATE MATCH VERIFICATION  (unchanged)
+    # =========================================================================
     def _normalize_plate(s: str) -> str:
         return _re.sub(r'[^A-Z0-9]', '', s.upper())
 
-    norm_ocr = _normalize_plate(plate_number)
+    norm_ocr    = _normalize_plate(plate_number)
     norm_manual = _normalize_plate(manual_plate) if manual_plate else ""
     plate_match = None
     if norm_manual and norm_ocr:
         plate_match = norm_manual == norm_ocr
 
-    # Auto-reject if AI confidence is below 30%
+    # =========================================================================
+    # AUTO-REJECT LOGIC  (unchanged for helmet; extended for parking)
+    # =========================================================================
     auto_status = "Auto-Rejected" if confidence_pct < 30 else "Under Review"
 
-    # Auto-reject "No Helmet" reports when AI found everyone wearing helmets
-    # or when AI model is unavailable (can't verify the claim)
     _vt = (violation_type or "").lower().replace(" ", "")
     _is_helmet_violation = _vt in ("nohelmet", "helmet")
     if _is_helmet_violation:
         if not AI_MODEL_AVAILABLE:
-            # No AI to verify — reject since we can't confirm helmet violation
             auto_status = "Auto-Rejected"
         elif helmet_info:
             try:
-                # helmet_info format: "X with helmet, Y without"
                 parts = helmet_info.split(",")
                 without_count = int(parts[1].strip().split()[0]) if len(parts) >= 2 else -1
                 if without_count == 0:
@@ -277,35 +388,90 @@ async def analyze(
             except (ValueError, IndexError):
                 pass
 
-    # Store report in database
-    report = db.create_report(
-        user_id=user_id,
-        plate_number=plate_number,
-        violation_type=detected_violation,
-        confidence=confidence_pct,
-        media_url=media_url,
-        annotated_url=annotated_url,
-        location=location,
-        description=description,
-        helmet_detected=helmet_info,
-        status=auto_status,
-        manual_plate=norm_manual,
-    )
+    # =========================================================================
+    # STORE REPORT
+    # =========================================================================
+    # Design rule (prevents duplicate queue entries):
+    #   • Parking-ONLY upload  → save ONLY the per-violation parking rows.
+    #     The primary create_report() is skipped entirely; the first parking
+    #     row is used as the "primary" for the API response.
+    #   • Helmet/plate upload  → save the primary row as before (no parking rows).
+    #   • Mixed (both detected) → save the primary row for the helmet violation
+    #     AND the per-violation parking rows.
+    #
+    # Without this guard, one upload with one parking violation would produce
+    # TWO rows in the reports table (primary + parking), both appearing in the
+    # authority queue.
+
+    is_parking_only = bool(parking_violations) and not helmet_info
+
+    # ── Save per-violation parking rows (always, when parking detected) ───────
+    saved_parking_reports: List[Dict[str, Any]] = []
+    for pv in parking_violations:
+        pv_plate = pv.get("plate", "")
+        if pv_plate == "UNREADABLE":
+            pv_plate = ""
+        pv_conf_pct = round(pv.get("confidence", 0.0) * 100, 1)
+        # Encode distance in description so it can be read back by the frontend
+        pv_distance = pv.get("distance", 0)
+        pv_desc = f"distance:{pv_distance}" if pv_distance else (description or "")
+        pv_report = db.create_parking_violation_report(
+            user_id=user_id,
+            plate_number=pv_plate,
+            violation_type=pv.get("type", "Illegal Parking"),
+            fine_amount="",
+            confidence=pv_conf_pct,
+            vehicle_type=pv.get("vehicle", ""),
+            media_url=media_url,
+            annotated_url=annotated_url,   # parking annotated image (or empty)
+            location=location,
+            description=pv_desc,
+        )
+        saved_parking_reports.append(pv_report)
+
+    # ── Save primary row only for helmet/plate or mixed uploads ───────────────
+    if not is_parking_only:
+        primary_source = "parking" if parking_violations else "helmet_plate"
+        report = db.create_report(
+            user_id=user_id,
+            plate_number=plate_number,
+            violation_type=detected_violation,
+            confidence=confidence_pct,
+            media_url=media_url,
+            annotated_url=annotated_url,
+            location=location,
+            description=description,
+            helmet_detected=helmet_info,
+            status=auto_status,
+            manual_plate=norm_manual,
+            fine_amount="",
+            source=primary_source,
+        )
+    else:
+        # Parking-only: use the first parking row as the primary for the response
+        report = saved_parking_reports[0] if saved_parking_reports else {}
 
     return {
-        "report_id": report["id"],
-        "violation": report["violation_type"],
-        "plate": report["plate_number"],
-        "confidence": report["confidence"],
-        "status": report["status"],
-        "auto_rejected": auto_status == "Auto-Rejected",
-        "media_url": report["media_url"],
-        "annotated_url": report.get("annotated_url", ""),
-        "helmet_detected": helmet_info,
-        "created_at": report["created_at"],
-        "manual_plate": norm_manual if norm_manual else None,
-        "ocr_plate": norm_ocr if norm_ocr else None,
-        "match": plate_match,
+        "report_id"       : report.get("id"),
+        "violation"       : report.get("violation_type"),
+        "plate"           : report.get("plate_number"),
+        "confidence"      : report.get("confidence"),
+        "status"          : report.get("status"),
+        "auto_rejected"   : report.get("status") == "Auto-Rejected",
+        "media_url"       : report.get("media_url"),
+        "annotated_url"   : report.get("annotated_url", ""),
+        "helmet_detected" : helmet_info,
+        # ── Violation detail fields ──
+        "violations"         : combined_violations,
+        "vehicle_count"      : vehicle_count,
+        "sign_detected"      : sign_detected,
+        "parking_violations" : parking_violations,
+        "parking_report_ids" : [r["id"] for r in saved_parking_reports],
+        # ── Existing fields ──
+        "created_at"      : report.get("created_at"),
+        "manual_plate"    : norm_manual if norm_manual else None,
+        "ocr_plate"       : norm_ocr if norm_ocr else None,
+        "match"           : plate_match,
     }
 
 
@@ -343,6 +509,16 @@ async def get_all():
     """Get all reports (for authority archive)."""
     reports = db.get_all_reports()
     return {"reports": reports}
+
+
+@app.get("/api/reports/parking")
+async def get_parking_reports(user_id: Optional[int] = Query(None)):
+    """
+    Return parking-violation reports stored by the parking detection pipeline.
+    Pass ?user_id=<id> to filter by reporter; omit for all parking reports.
+    """
+    reports = db.get_parking_violation_reports(user_id=user_id)
+    return {"reports": reports, "count": len(reports)}
 
 
 @app.get("/api/reports/{report_id}")
@@ -418,30 +594,48 @@ async def update_report_details(
 
 @app.post("/api/reports/{report_id}/approve")
 async def approve_report(report_id: int):
-    """Approve a report: status → Approved, +150 karma to reporter."""
+    """
+    Approve a report: status → Approved, award karma to reporter.
+    Works identically for both helmet/plate and parking violations
+    (both live in the same `reports` table with the same status column).
+    Karma awarded is the same for both violation types.
+    """
     report = db.get_report_by_id(report_id)
     if not report:
         raise HTTPException(status_code=404, detail="Report not found")
     if report["status"] != "Under Review":
         raise HTTPException(status_code=400, detail=f"Report already {report['status']}")
 
-    # Update status
+    # Determine karma amount by source (same value, but explicit for future tuning)
+    source = report.get("source", "helmet_plate")
+    karma_to_award = (
+        KARMA_POINTS_PER_PARKING_APPROVAL
+        if source == "parking"
+        else KARMA_POINTS_PER_APPROVAL
+    )
+
+    # Update status → Approved
     updated = db.update_report_status(report_id, "Approved")
 
     # Award karma points to the reporter
-    new_balance = db.update_user_karma(report["user_id"], KARMA_POINTS_PER_APPROVAL)
+    new_balance = db.update_user_karma(report["user_id"], karma_to_award)
 
     return {
-        "success": True,
-        "report": updated,
-        "karma_awarded": KARMA_POINTS_PER_APPROVAL,
+        "success"           : True,
+        "report"            : updated,
+        "karma_awarded"     : karma_to_award,
         "user_karma_balance": new_balance,
+        # Extra context so the frontend can tailor its toast / UI update
+        "source"            : source,
+        "fine_amount"       : report.get("fine_amount", ""),
+        "vehicle_type"      : report.get("vehicle_type", ""),
+        "violation_type"    : report.get("violation_type", ""),
     }
 
 
 @app.post("/api/reports/{report_id}/reject")
 async def reject_report(report_id: int):
-    """Reject a report: status → Rejected."""
+    """Reject a report: status → Rejected. Works for both helmet and parking violations."""
     report = db.get_report_by_id(report_id)
     if not report:
         raise HTTPException(status_code=404, detail="Report not found")
@@ -451,8 +645,10 @@ async def reject_report(report_id: int):
     updated = db.update_report_status(report_id, "Rejected")
 
     return {
-        "success": True,
-        "report": updated,
+        "success"       : True,
+        "report"        : updated,
+        "source"        : report.get("source", "helmet_plate"),
+        "violation_type": report.get("violation_type", ""),
     }
 
 
@@ -523,9 +719,10 @@ async def authority_stats():
 @app.get("/api/health")
 async def health():
     return {
-        "status": "ok",
-        "ai_model_available": AI_MODEL_AVAILABLE,
-        "timestamp": datetime.now().isoformat(),
+        "status"                  : "ok",
+        "ai_model_available"      : AI_MODEL_AVAILABLE,
+        "parking_model_available" : PARKING_MODEL_AVAILABLE,
+        "timestamp"               : datetime.now().isoformat(),
     }
 
 

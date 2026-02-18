@@ -127,11 +127,11 @@
     </div>
   </div>
 
+  <script src="js/api.js"></script>
   <script src="js/store.js"></script>
   <script src="js/auth.js"></script>
   <script>
     (function() {
-      // If already logged in, redirect
       if (SaralAuth.isAuthenticated()) {
         SaralAuth.redirectToDashboard();
         return;
@@ -139,8 +139,9 @@
 
       const form = document.getElementById('signupForm');
       const errorEl = document.getElementById('authError');
+      const submitBtn = form.querySelector('.auth-submit');
 
-      form.addEventListener('submit', (e) => {
+      form.addEventListener('submit', async (e) => {
         e.preventDefault();
         errorEl.style.display = 'none';
 
@@ -154,14 +155,16 @@
           errorEl.style.display = 'block';
           return;
         }
-
         if (password.length < 6) {
           errorEl.textContent = 'Password must be at least 6 characters';
           errorEl.style.display = 'block';
           return;
         }
 
-        const result = SaralAuth.signUp(name, email, password, role);
+        submitBtn.disabled = true;
+        submitBtn.querySelector('span').textContent = 'Creating account...';
+
+        const result = await SaralAuth.signUp(name, email, password, role);
 
         if (result.success) {
           SaralToast.show(`Account created! Welcome, ${result.user.name}`, 'success');
@@ -169,6 +172,8 @@
         } else {
           errorEl.textContent = result.error;
           errorEl.style.display = 'block';
+          submitBtn.disabled = false;
+          submitBtn.querySelector('span').textContent = 'Create Account';
         }
       });
     })();

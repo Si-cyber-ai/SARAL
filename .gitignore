@@ -1,0 +1,53 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.py[co]
+*.egg
+*.egg-info/
+dist/
+build/
+
+# SQLite DB
+saral.db
+
+# Uploads
+backend/uploads/
+
+# Node/npm
+node_modules/
+
+# VS Code
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Misc
+*.swp
+*.bak
+*.tmp
+
+# HTML/JS build outputs (if any)
+*.min.js
+*.min.css
+
+# Ignore environment files
+.env
+.env.*
+
+# Ignore Jupyter notebooks outputs
+*.ipynb_checkpoints/
+
+# Ignore coverage
+htmlcov/
+.coverage
+coverage.xml
+
+# Ignore test artifacts
+pytest_cache/

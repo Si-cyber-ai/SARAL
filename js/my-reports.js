@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════════════
    SARAL — My Reports Page Logic
-   Status simulation, filtering, point awards
+   API-backed reports, filtering, real status
    ═══════════════════════════════════════════════════ */
 
 (function () {
@@ -8,6 +8,7 @@
 
   const state = SaralStore.get();
   let activeFilter = 'all';
+  let reportsLoaded = false;
 
   // ─── Sidebar Toggle (mobile) ───
   const toggle = document.getElementById('sidebarToggle');
@@ -42,16 +43,17 @@
 
   function statusMeta(status) {
     const map = {
-      pending:  { label: 'Pending',  cls: 'pending',  icon: '⏳', color: 'amber' },
-      verified: { label: 'Verified', cls: 'verified', icon: '✓',  color: 'blue' },
-      resolved: { label: 'Resolved', cls: 'resolved', icon: '✓',  color: 'green' },
-      rejected: { label: 'Rejected', cls: 'rejected', icon: '✗',  color: 'red' },
+      pending:  { label: 'Under Review', cls: 'pending',  icon: '⏳', color: 'amber' },
+      verified: { label: 'Approved',     cls: 'verified', icon: '✓',  color: 'green' },
+      resolved: { label: 'Approved',     cls: 'resolved', icon: '✓',  color: 'green' },
+      rejected: { label: 'Rejected',     cls: 'rejected', icon: '✗',  color: 'red' },
+      'Auto-Rejected': { label: 'Auto-Rejected', cls: 'rejected', icon: '✗', color: 'red' },
     };
     return map[status] || map.pending;
   }
 
   function violationIcon(type) {
-    const lcType = type.toLowerCase();
+    const lcType = (type || '').toLowerCase();
     if (lcType.includes('signal'))    return '<svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="7" y="1" width="6" height="18" rx="2" stroke="currentColor" stroke-width="1.5"/><circle cx="10" cy="5" r="1.5" fill="currentColor"/><circle cx="10" cy="10" r="1.5" fill="currentColor"/><circle cx="10" cy="15" r="1.5" fill="currentColor"/></svg>';
     if (lcType.includes('speed'))     return '<svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 18a8 8 0 100-16 8 8 0 000 16z" stroke="currentColor" stroke-width="1.5"/><path d="M10 6v4l3 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>';
     if (lcType.includes('parking'))   return '<svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="3" y="3" width="14" height="14" rx="3" stroke="currentColor" stroke-width="1.5"/><path d="M8 14V6h3a3 3 0 010 6H8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
@@ -68,14 +70,22 @@
     card.dataset.id = report.id;
     card.dataset.status = report.status;
 
+    const plateStr = report.plate ? `<span class="report-card__plate" style="font-family:monospace;font-size:12px;font-weight:600;color:#1e40af;background:rgba(79,140,255,.08);padding:3px 8px;border-radius:6px;margin-top:4px;display:inline-block;">${report.plate}</span>` : '';
+
+    const thumbnailHtml = report.thumbnail
+      ? `<img src="${SaralAPI.mediaUrl(report.thumbnail)}" style="width:100%;height:120px;object-fit:cover;border-radius:12px;margin-bottom:12px;" alt="Evidence" />`
+      : '';
+
     card.innerHTML = `
+      ${thumbnailHtml}
       <div class="report-card__top">
         <div class="report-card__icon report-card__icon--${meta.color}">
           ${violationIcon(report.type)}
         </div>
         <div class="report-card__meta">
           <span class="report-card__type">${report.type}</span>
-          <span class="report-card__id">${report.id}</span>
+          <span class="report-card__id">RPT-${String(report.id).padStart(4, '0')}</span>
+          ${plateStr}
         </div>
         <span class="report-card__status report-card__status--${meta.cls}">
           ${meta.label}
@@ -84,7 +94,7 @@
       <div class="report-card__body">
         <div class="report-card__detail">
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1.75a4.375 4.375 0 00-4.375 4.375C2.625 9.5 7 12.25 7 12.25s4.375-2.75 4.375-6.125A4.375 4.375 0 007 1.75z" stroke="currentColor" stroke-width="1.2"/><circle cx="7" cy="6.125" r="1.5" stroke="currentColor" stroke-width="1.2"/></svg>
-          <span>${report.location}</span>
+          <span>${report.location || 'Location not specified'}</span>
         </div>
         <div class="report-card__detail">
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1.75" y="2.625" width="10.5" height="9.625" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M1.75 5.25h10.5M4.375 1.75v1.75M9.625 1.75v1.75" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
@@ -130,10 +140,14 @@
 
   function updateCounts() {
     const reports = state.reports;
-    document.getElementById('totalCount').textContent = reports.length;
-    document.getElementById('pendingCount').textContent = reports.filter(r => r.status === 'pending').length;
-    document.getElementById('verifiedCount').textContent = reports.filter(r => r.status === 'verified').length;
-    document.getElementById('resolvedCount').textContent = reports.filter(r => r.status === 'resolved').length;
+    const totalEl = document.getElementById('totalCount');
+    const pendingEl = document.getElementById('pendingCount');
+    const verifiedEl = document.getElementById('verifiedCount');
+    const resolvedEl = document.getElementById('resolvedCount');
+    if (totalEl) totalEl.textContent = reports.length;
+    if (pendingEl) pendingEl.textContent = reports.filter(r => r.status === 'pending').length;
+    if (verifiedEl) verifiedEl.textContent = reports.filter(r => r.status === 'verified').length;
+    if (resolvedEl) resolvedEl.textContent = reports.filter(r => r.status === 'verified' || r.status === 'resolved').length;
   }
 
   // ─── Filter Buttons ───
@@ -146,46 +160,38 @@
     });
   });
 
-  // ─── Auto Status Simulation ───
-  function simulateStatusUpdates() {
-    const pendingReports = state.reports.filter(r => r.status === 'pending');
+  // ─── Load Reports from API ───
+  async function loadReports() {
+    const userId = SaralAuth.getUserId();
+    if (!userId) return;
 
-    pendingReports.forEach(report => {
-      const delay = 5000 + Math.random() * 3000; // 5-8 seconds
-      setTimeout(() => {
-        // 80% chance verify, 20% reject
-        const newStatus = Math.random() < 0.8 ? 'verified' : 'rejected';
+    try {
+      const data = await SaralAPI.getUserReports(userId);
+      if (data.reports) {
+        SaralStore.syncReports(data.reports);
+        renderReports();
+      }
+    } catch (err) {
+      console.error('[MyReports] Failed to load:', err);
+      SaralToast.show('Failed to load reports: ' + err.message, 'error');
+      // Render whatever is in state
+      renderReports();
+    }
+  }
 
-        SaralStore.set(s => {
-          const r = s.reports.find(rep => rep.id === report.id);
-          if (r && r.status === 'pending') {
-            r.status = newStatus;
-            if (newStatus === 'verified') {
-              r.points = 150;
-              s.user.points += 150;
-              SaralToast.show(`+150 Karma Points! "${r.type}" report verified`, 'reward');
-            } else {
-              SaralToast.show(`Report "${r.type}" was not verified`, 'error');
-            }
-          }
-        });
-
-        // Animate the status change on the card
-        const card = document.querySelector(`[data-id="${report.id}"]`);
-        if (card) {
-          card.classList.add('report-card--updating');
-          setTimeout(() => {
-            renderReports();
-          }, 400);
-        } else {
-          renderReports();
-        }
-      }, delay);
-    });
+  // ─── Update sidebar profile ───
+  async function updateSidebar() {
+    await SaralAuth.refreshUser();
+    const user = SaralAuth.getUser();
+    const s = SaralStore.get();
+    const profileName = document.querySelector('.sidebar__profile-name');
+    const profileAvatar = document.querySelector('.sidebar__profile-avatar span');
+    if (profileName) profileName.textContent = user.name;
+    if (profileAvatar) profileAvatar.textContent = s.user.initials;
   }
 
   // ─── Init ───
-  renderReports();
-  simulateStatusUpdates();
+  updateSidebar();
+  loadReports();
 
 })();

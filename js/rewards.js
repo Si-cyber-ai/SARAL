@@ -1,12 +1,13 @@
 /* ═══════════════════════════════════════════════════
    SARAL — Rewards Page Logic
-   Point balance, redemption, history
+   API-backed point balance, redemption, history
    ═══════════════════════════════════════════════════ */
 
 (function () {
   'use strict';
 
   const state = SaralStore.get();
+  let catalogue = [];
 
   // ─── Sidebar Toggle (mobile) ───
   const toggle = document.getElementById('sidebarToggle');
@@ -31,11 +32,10 @@
   };
 
   // ─── Render Balance ───
-  function renderBalance() {
-    const pts = state.user.points;
+  function renderBalance(points) {
+    const pts = points !== undefined ? points : state.user.points;
     animateNumber(document.getElementById('pointsBalance'), pts);
 
-    // Tier logic
     const tiers = [
       { name: 'Bronze',   min: 0,    max: 500 },
       { name: 'Silver',   min: 500,  max: 1000 },
@@ -53,24 +53,30 @@
       }
     }
 
-    document.getElementById('tierName').textContent = current.name;
+    const tierNameEl = document.getElementById('tierName');
     const tierBadge = document.getElementById('tierBadge');
-    tierBadge.className = 'rewards-balance__tier rewards-balance__tier--' + current.name.toLowerCase();
+    if (tierNameEl) tierNameEl.textContent = current.name;
+    if (tierBadge) tierBadge.className = 'rewards-balance__tier rewards-balance__tier--' + current.name.toLowerCase();
+
+    const nextTierEl = document.getElementById('nextTier');
+    const tierProgressEl = document.getElementById('tierProgress');
+    const tierPtsEl = document.getElementById('tierPtsLabel');
 
     if (next) {
       const ptsToGo = next.min - pts;
       const progress = ((pts - current.min) / (next.min - current.min)) * 100;
-      document.getElementById('nextTier').textContent = next.name;
-      document.getElementById('tierProgress').style.width = Math.min(progress, 100) + '%';
-      document.getElementById('tierPtsLabel').textContent = `${ptsToGo} pts to go`;
+      if (nextTierEl) nextTierEl.textContent = next.name;
+      if (tierProgressEl) tierProgressEl.style.width = Math.min(progress, 100) + '%';
+      if (tierPtsEl) tierPtsEl.textContent = `${ptsToGo} pts to go`;
     } else {
-      document.getElementById('nextTier').textContent = 'Max';
-      document.getElementById('tierProgress').style.width = '100%';
-      document.getElementById('tierPtsLabel').textContent = 'Max tier reached!';
+      if (nextTierEl) nextTierEl.textContent = 'Max';
+      if (tierProgressEl) tierProgressEl.style.width = '100%';
+      if (tierPtsEl) tierPtsEl.textContent = 'Max tier reached!';
     }
   }
 
   function animateNumber(el, target) {
+    if (!el) return;
     let current = 0;
     const duration = 800;
     const start = performance.now();
@@ -85,12 +91,15 @@
   }
 
   // ─── Render Catalogue ───
-  function renderCatalogue() {
+  function renderCatalogue(userPoints) {
     const grid = document.getElementById('rewardsGrid');
+    if (!grid) return;
     grid.innerHTML = '';
 
-    state.rewards.catalogue.forEach((reward, i) => {
-      const canAfford = state.user.points >= reward.cost;
+    const pts = userPoints !== undefined ? userPoints : state.user.points;
+
+    catalogue.forEach((reward, i) => {
+      const canAfford = pts >= reward.cost;
       const card = document.createElement('div');
       card.className = 'reward-card';
       card.style.animationDelay = `${i * 0.08}s`;
@@ -122,57 +131,56 @@
     });
   }
 
-  // ─── Redeem Handler ───
-  function handleRedeem(rewardId) {
-    const reward = state.rewards.catalogue.find(r => r.id === rewardId);
-    if (!reward || state.user.points < reward.cost) {
-      SaralToast.show('Insufficient Karma Points', 'error');
+  // ─── Redeem Handler (API-backed) ───
+  async function handleRedeem(rewardId) {
+    const reward = catalogue.find(r => r.id === rewardId);
+    if (!reward) return;
+
+    const userId = SaralAuth.getUserId();
+    if (!userId) {
+      SaralToast.show('Please sign in again', 'error');
       return;
     }
 
-    // Deduct points
-    SaralStore.set(s => {
-      s.user.points -= reward.cost;
-      s.rewards.redeemed.push({
-        id: 'RDM-' + Date.now(),
-        rewardId: reward.id,
-        title: reward.title,
-        cost: reward.cost,
-        date: new Date().toISOString(),
+    try {
+      const result = await SaralAPI.redeemReward(userId, rewardId);
+
+      SaralToast.show(`Redeemed "${reward.title}" for ${reward.cost} pts!`, 'success');
+
+      // Update local state
+      SaralStore.set(s => {
+        s.user.points = result.new_balance;
       });
-    });
 
-    SaralToast.show(`Redeemed "${reward.title}" for ${reward.cost} pts!`, 'success');
-
-    // Re-render
-    renderBalance();
-    renderCatalogue();
-    renderHistory();
+      renderBalance(result.new_balance);
+      renderCatalogue(result.new_balance);
+      loadHistory();
+    } catch (err) {
+      SaralToast.show('Redemption failed: ' + err.message, 'error');
+    }
   }
 
   // ─── Render History ───
-  function renderHistory() {
+  function renderHistory(history) {
     const container = document.getElementById('rewardsHistory');
     const emptyEl = document.getElementById('historyEmpty');
-    const redeemed = state.rewards.redeemed;
+    if (!container) return;
 
-    // Clear old items but keep empty
     container.querySelectorAll('.rewards-history__item').forEach(el => el.remove());
 
-    if (redeemed.length === 0) {
-      emptyEl.style.display = 'flex';
+    if (!history || history.length === 0) {
+      if (emptyEl) emptyEl.style.display = 'flex';
       return;
     }
-    emptyEl.style.display = 'none';
+    if (emptyEl) emptyEl.style.display = 'none';
 
-    // Show newest first
-    [...redeemed].reverse().forEach(item => {
+    history.forEach(item => {
       const el = document.createElement('div');
       el.className = 'rewards-history__item';
-      const catItem = state.rewards.catalogue.find(c => c.id === item.rewardId);
+      const catItem = catalogue.find(c => c.id === item.reward_id);
       const icon = catItem ? (rewardIcons[catItem.icon] || rewardIcons.gift) : rewardIcons.gift;
 
-      const d = new Date(item.date);
+      const d = new Date(item.redeemed_at);
       const dateStr = d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
 
       el.innerHTML = `
@@ -187,9 +195,48 @@
     });
   }
 
-  // ─── Init ───
-  renderBalance();
-  renderCatalogue();
-  renderHistory();
+  // ─── Load from API ───
+  async function loadCatalogue() {
+    try {
+      const data = await SaralAPI.getRewardsCatalogue();
+      catalogue = data.catalogue || [];
+    } catch (err) {
+      console.error('[Rewards] Failed to load catalogue:', err);
+      catalogue = [];
+    }
+  }
+
+  async function loadHistory() {
+    const userId = SaralAuth.getUserId();
+    if (!userId) return;
+    try {
+      const data = await SaralAPI.getRewardsHistory(userId);
+      renderHistory(data.history || []);
+    } catch (err) {
+      console.error('[Rewards] Failed to load history:', err);
+    }
+  }
+
+  async function init() {
+    // Refresh user data from API
+    await SaralAuth.refreshUser();
+    const user = SaralAuth.getUser();
+    const pts = SaralStore.get().user.points;
+
+    // Load catalogue, then render
+    await loadCatalogue();
+
+    renderBalance(pts);
+    renderCatalogue(pts);
+    loadHistory();
+
+    // Update sidebar profile
+    const profileName = document.querySelector('.sidebar__profile-name');
+    const profileAvatar = document.querySelector('.sidebar__profile-avatar span');
+    if (profileName) profileName.textContent = user.name;
+    if (profileAvatar) profileAvatar.textContent = SaralStore.get().user.initials;
+  }
+
+  init();
 
 })();

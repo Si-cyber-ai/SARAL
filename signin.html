@@ -130,11 +130,11 @@
     </div>
   </div>
 
+  <script src="js/api.js"></script>
   <script src="js/store.js"></script>
   <script src="js/auth.js"></script>
   <script>
     (function() {
-      // If already logged in, redirect
       if (SaralAuth.isAuthenticated()) {
         SaralAuth.redirectToDashboard();
         return;
@@ -142,16 +142,19 @@
 
       const form = document.getElementById('signinForm');
       const errorEl = document.getElementById('authError');
+      const submitBtn = form.querySelector('.auth-submit');
 
-      form.addEventListener('submit', (e) => {
+      form.addEventListener('submit', async (e) => {
         e.preventDefault();
         errorEl.style.display = 'none';
+        submitBtn.disabled = true;
+        submitBtn.querySelector('span').textContent = 'Signing in...';
 
         const email = document.getElementById('email').value.trim();
         const password = document.getElementById('password').value;
         const role = document.querySelector('input[name="role"]:checked').value;
 
-        const result = SaralAuth.signIn(email, password, role);
+        const result = await SaralAuth.signIn(email, password, role);
 
         if (result.success) {
           SaralToast.show(`Welcome back, ${result.user.name}!`, 'success');
@@ -159,10 +162,11 @@
         } else {
           errorEl.textContent = result.error;
           errorEl.style.display = 'block';
+          submitBtn.disabled = false;
+          submitBtn.querySelector('span').textContent = 'Sign In';
         }
       });
 
-      // Demo account quick-fill
       document.querySelectorAll('.auth-demo__btn').forEach(btn => {
         btn.addEventListener('click', () => {
           document.getElementById('email').value = btn.dataset.email;

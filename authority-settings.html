@@ -293,6 +293,7 @@
     </div>
   </main>
 
+  <script src="js/api.js"></script>
   <script src="js/store.js"></script>
   <script src="js/auth.js"></script>
   <script>SaralAuth.requireAuth('authority');</script>
@@ -372,22 +373,13 @@
         document.getElementById('confirmPass').value = '';
       });
 
-      savePassBtn.addEventListener('click', function () {
+      savePassBtn.addEventListener('click', async function () {
         const current = document.getElementById('currentPass').value;
         const newP = document.getElementById('newPass').value;
         const confirm = document.getElementById('confirmPass').value;
 
         if (!current || !newP || !confirm) {
           if (typeof SaralToast !== 'undefined') SaralToast.show('All password fields are required', 'error');
-          return;
-        }
-
-        // Verify current password
-        const user = SaralAuth.getUser();
-        const users = JSON.parse(localStorage.getItem('saral_users') || '[]');
-        const match = users.find(u => u.email === user.email && u.password === current);
-        if (!match) {
-          if (typeof SaralToast !== 'undefined') SaralToast.show('Current password is incorrect', 'error');
           return;
         }
 
@@ -400,15 +392,27 @@
           return;
         }
 
-        // Update password
-        match.password = newP;
-        localStorage.setItem('saral_users', JSON.stringify(users));
+        // Verify current password via API sign-in
+        try {
+          const user = SaralAuth.getUser();
+          await SaralAPI.signIn(user.email, current);
+        } catch (err) {
+          if (typeof SaralToast !== 'undefined') SaralToast.show('Current password is incorrect', 'error');
+          return;
+        }
 
-        passwordForm.style.display = 'none';
-        document.getElementById('currentPass').value = '';
-        document.getElementById('newPass').value = '';
-        document.getElementById('confirmPass').value = '';
-        if (typeof SaralToast !== 'undefined') SaralToast.show('Password updated successfully', 'success');
+        // Update password via API
+        try {
+          const userId = SaralAuth.getUserId();
+          await SaralAPI.updateProfile(userId, undefined, undefined, undefined, newP);
+          passwordForm.style.display = 'none';
+          document.getElementById('currentPass').value = '';
+          document.getElementById('newPass').value = '';
+          document.getElementById('confirmPass').value = '';
+          if (typeof SaralToast !== 'undefined') SaralToast.show('Password updated successfully', 'success');
+        } catch (err) {
+          if (typeof SaralToast !== 'undefined') SaralToast.show('Failed to update password: ' + err.message, 'error');
+        }
       });
 
       /* ─── TOGGLE FEEDBACK ─── */

@@ -138,6 +138,7 @@
     </div>
   </div>
 
+  <script src="js/api.js"></script>
   <script src="js/store.js"></script>
   <script src="js/auth.js"></script>
   <script>SaralAuth.requireAuth('authority');</script>
@@ -146,24 +147,8 @@
     (function () {
       'use strict';
 
-      /* ─── ARCHIVE DATA ─── */
-      const archiveData = [
-        { id: 'SARAL-2026-00847', type: 'Signal Jumping', plate: 'KA-01-AB-1234', location: 'MG Road, Bangalore', confidence: 97, decision: 'approved', reviewer: 'Insp. T. Prasad', date: '2026-02-11', time: '14:23', aiModel: 'v3.2.1', evidenceFrames: 4, responseTime: '18 min' },
-        { id: 'SARAL-2026-00846', type: 'Wrong-Way Driving', plate: 'DL-02-CD-5678', location: 'NH-48, Delhi', confidence: 94, decision: 'approved', reviewer: 'Insp. T. Prasad', date: '2026-02-11', time: '11:07', aiModel: 'v3.2.1', evidenceFrames: 6, responseTime: '22 min' },
-        { id: 'SARAL-2026-00845', type: 'Over Speeding', plate: 'MH-12-EF-9012', location: 'Pune-Mumbai Expy', confidence: 88, decision: 'approved', reviewer: 'SI R. Verma', date: '2026-02-11', time: '09:41', aiModel: 'v3.2.1', evidenceFrames: 3, responseTime: '31 min' },
-        { id: 'SARAL-2026-00844', type: 'Illegal Parking', plate: 'KA-05-GH-3456', location: 'Sector 17, Chandigarh', confidence: 91, decision: 'rejected', reviewer: 'Insp. T. Prasad', date: '2026-02-10', time: '19:55', aiModel: 'v3.2.1', evidenceFrames: 2, responseTime: '45 min' },
-        { id: 'SARAL-2026-00843', type: 'No Helmet', plate: 'TS-08-IJ-7890', location: 'Hitech City, Hyderabad', confidence: 96, decision: 'approved', reviewer: 'SI K. Rao', date: '2026-02-10', time: '16:12', aiModel: 'v3.2.0', evidenceFrames: 2, responseTime: '14 min' },
-        { id: 'SARAL-2026-00842', type: 'Lane Violation', plate: 'TN-07-KL-2345', location: 'OMR, Chennai', confidence: 82, decision: 'rejected', reviewer: 'Insp. T. Prasad', date: '2026-02-10', time: '08:30', aiModel: 'v3.2.0', evidenceFrames: 5, responseTime: '28 min' },
-        { id: 'SARAL-2026-00841', type: 'Signal Jumping', plate: 'DL-04-MN-6789', location: 'Connaught Place, Delhi', confidence: 99, decision: 'approved', reviewer: 'SI R. Verma', date: '2026-02-09', time: '21:18', aiModel: 'v3.2.0', evidenceFrames: 4, responseTime: '12 min' },
-        { id: 'SARAL-2026-00840', type: 'Wrong-Way Driving', plate: 'MH-01-OP-3456', location: 'Western Expy, Mumbai', confidence: 91, decision: 'approved', reviewer: 'Insp. T. Prasad', date: '2026-02-09', time: '17:42', aiModel: 'v3.2.0', evidenceFrames: 7, responseTime: '19 min' },
-        { id: 'SARAL-2026-00839', type: 'Over Speeding', plate: 'KA-03-QR-8901', location: 'NICE Road, Bangalore', confidence: 85, decision: 'approved', reviewer: 'SI K. Rao', date: '2026-02-09', time: '06:55', aiModel: 'v3.1.9', evidenceFrames: 3, responseTime: '35 min' },
-        { id: 'SARAL-2026-00838', type: 'Illegal Parking', plate: 'UP-80-ST-1234', location: 'Mall Road, Lucknow', confidence: 78, decision: 'rejected', reviewer: 'Insp. T. Prasad', date: '2026-02-08', time: '13:08', aiModel: 'v3.1.9', evidenceFrames: 2, responseTime: '52 min' },
-        { id: 'SARAL-2026-00837', type: 'Signal Jumping', plate: 'GJ-01-UV-5678', location: 'SG Highway, Ahmedabad', confidence: 93, decision: 'approved', reviewer: 'SI R. Verma', date: '2026-02-08', time: '10:27', aiModel: 'v3.1.9', evidenceFrames: 4, responseTime: '16 min' },
-        { id: 'SARAL-2026-00836', type: 'No Helmet', plate: 'RJ-14-WX-9012', location: 'MI Road, Jaipur', confidence: 97, decision: 'approved', reviewer: 'Insp. T. Prasad', date: '2026-02-08', time: '07:44', aiModel: 'v3.1.9', evidenceFrames: 2, responseTime: '11 min' },
-        { id: 'SARAL-2026-00835', type: 'Lane Violation', plate: 'HR-26-YZ-3456', location: 'NH-44, Gurugram', confidence: 76, decision: 'rejected', reviewer: 'SI K. Rao', date: '2026-02-07', time: '22:31', aiModel: 'v3.1.8', evidenceFrames: 5, responseTime: '41 min' },
-        { id: 'SARAL-2026-00834', type: 'Over Speeding', plate: 'KL-07-AB-7890', location: 'NH-66, Kochi', confidence: 90, decision: 'approved', reviewer: 'Insp. T. Prasad', date: '2026-02-07', time: '15:13', aiModel: 'v3.1.8', evidenceFrames: 3, responseTime: '20 min' },
-        { id: 'SARAL-2026-00833', type: 'Wrong-Way Driving', plate: 'WB-02-CD-1234', location: 'EM Bypass, Kolkata', confidence: 86, decision: 'approved', reviewer: 'SI R. Verma', date: '2026-02-07', time: '11:50', aiModel: 'v3.1.8', evidenceFrames: 6, responseTime: '25 min' },
-      ];
+      /* ─── ARCHIVE DATA — loaded from API ─── */
+      let archiveData = [];
 
       const tbody = document.getElementById('archiveBody');
       const resultCount = document.getElementById('resultCount');
@@ -171,14 +156,60 @@
       const decisionFilter = document.getElementById('filterDecision');
       const sortFilter = document.getElementById('filterSort');
 
+      async function loadArchive() {
+        try {
+          const res = await SaralAPI.getAllReports();
+          const reports = res.reports || [];
+          // Only show authority-reviewed reports (Approved or Rejected by authority, NOT Auto-Rejected)
+          archiveData = reports
+            .filter(r => r.status === 'Approved' || r.status === 'Rejected')
+            .map((r, i) => {
+              const dt = new Date(r.created_at);
+              return {
+                id: 'SARAL-' + String(r.id).padStart(6, '0'),
+                rawId: r.id,
+                type: r.violation_type || 'Unknown',
+                plate: r.plate_number || '—',
+                manualPlate: r.manual_plate || '',
+                location: r.location || 'Unknown',
+                confidence: r.confidence ? Math.round(r.confidence) : 0,
+                decision: r.status === 'Approved' ? 'approved' : 'rejected',
+                reviewer: r.reviewer || 'Authority',
+                date: dt.toISOString().split('T')[0],
+                time: dt.toTimeString().slice(0, 5),
+                mediaUrl: r.media_url || null,
+                annotatedUrl: r.annotated_url || null,
+                helmet: r.helmet_detected,
+              };
+            });
+
+          renderTable(archiveData);
+        } catch (err) {
+          console.error('[Archive] Failed to load:', err);
+          tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:32px;color:#94a3b8;">Failed to load archive data</td></tr>';
+          resultCount.textContent = '0 records';
+        }
+      }
+
       function renderTable(data) {
         tbody.innerHTML = '';
+        if (data.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:32px;color:#94a3b8;">No reviewed reports yet</td></tr>';
+          resultCount.textContent = '0 records';
+          return;
+        }
         data.forEach(row => {
           const tr = document.createElement('tr');
           tr.dataset.caseId = row.id;
           tr.innerHTML = `
             <td style="font-weight: 600; color: var(--gray-800); font-size: 12px; font-family: var(--font-display);">${row.id}</td>
-            <td>${row.type}</td>
+            <td>
+              ${row.type}
+              <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:3px;">
+                <span style="display:inline-flex;align-items:center;gap:2px;background:rgba(79,140,255,.1);color:#1e40af;font-size:9px;font-weight:700;padding:1px 5px;border-radius:4px;font-family:var(--font-display);letter-spacing:.3px;border:1px solid rgba(79,140,255,.15);" title="AI detected plate">🤖 ${row.plate}</span>
+                ${row.manualPlate ? `<span style="display:inline-flex;align-items:center;gap:2px;background:rgba(251,191,36,.12);color:#78350f;font-size:9px;font-weight:700;padding:1px 5px;border-radius:4px;font-family:var(--font-display);letter-spacing:.3px;border:1px solid rgba(251,191,36,.2);" title="Citizen reported plate">🚗 ${row.manualPlate}</span>` : ''}
+              </div>
+            </td>
             <td>${row.location}</td>
             <td>
               <span class="confidence-bar"><span class="confidence-bar__fill" style="width: ${row.confidence}%; background: ${row.confidence >= 90 ? 'var(--green-500)' : row.confidence >= 80 ? 'var(--blue-500)' : 'var(--amber-500)'}"></span></span>
@@ -203,6 +234,7 @@
           data = data.filter(r =>
             r.id.toLowerCase().includes(q) ||
             r.plate.toLowerCase().includes(q) ||
+            r.manualPlate.toLowerCase().includes(q) ||
             r.location.toLowerCase().includes(q) ||
             r.type.toLowerCase().includes(q)
           );
@@ -228,8 +260,8 @@
       decisionFilter.addEventListener('change', applyFilters);
       sortFilter.addEventListener('change', applyFilters);
 
-      // Initial render
-      renderTable(archiveData);
+      // Load archive from API
+      loadArchive();
 
       /* ─── DETAIL DRAWER ─── */
       const overlay = document.getElementById('drawerOverlay');
@@ -240,18 +272,53 @@
 
       function openDrawer(row) {
         drawerTitle.textContent = row.id;
+
+        // AI-annotated image section (with bounding boxes)
+        let imageSection = '';
+        if (row.annotatedUrl) {
+          imageSection += `
+            <div style="margin-bottom:16px;">
+              <div style="font-size:12px;font-weight:600;color:var(--gray-500);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px;">AI Detection Result</div>
+              <img src="${SaralAPI.mediaUrl(row.annotatedUrl)}" style="width:100%;border-radius:12px;border:1px solid rgba(0,0,0,.08);cursor:pointer;" alt="AI Annotated" onclick="window.open(this.src,'_blank')" title="Click to view full size" />
+              <div style="font-size:11px;color:var(--gray-400);margin-top:4px;text-align:center;">Bounding boxes show detected plates &amp; helmets</div>
+            </div>
+          `;
+        }
+        if (row.mediaUrl) {
+          imageSection += `
+            <div style="margin-bottom:16px;">
+              <div style="font-size:12px;font-weight:600;color:var(--gray-500);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px;">Original Evidence</div>
+              <img src="${SaralAPI.mediaUrl(row.mediaUrl)}" style="width:100%;border-radius:12px;border:1px solid rgba(0,0,0,.08);cursor:pointer;" alt="Original Evidence" onclick="window.open(this.src,'_blank')" title="Click to view full size" />
+            </div>
+          `;
+        }
+
         drawerBody.innerHTML = `
+          ${imageSection}
           <div class="detail-drawer__row"><span class="detail-drawer__label">Case ID</span><span class="detail-drawer__value">${row.id}</span></div>
           <div class="detail-drawer__row"><span class="detail-drawer__label">Violation Type</span><span class="detail-drawer__value">${row.type}</span></div>
-          <div class="detail-drawer__row"><span class="detail-drawer__label">Vehicle Plate</span><span class="detail-drawer__value" style="font-family: var(--font-display); font-weight: 700;">${row.plate}</span></div>
+          <div style="background:rgba(79,140,255,.06);border-radius:12px;padding:12px 14px;margin:4px -4px;border:1px solid rgba(79,140,255,.15);">
+            <div style="font-size:10px;font-weight:700;color:#3b82f6;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;">🤖 AI Detected Plate (OCR)</div>
+            <div style="font-family:var(--font-display);font-weight:800;font-size:18px;color:#1e3a5f;letter-spacing:2px;">${row.plate || 'Not detected'}</div>
+          </div>
+          <div style="background:linear-gradient(135deg,rgba(251,191,36,.08),rgba(245,158,11,.05));border-radius:12px;padding:12px 14px;margin:4px -4px;border:1px solid rgba(251,191,36,.2);">
+            <div style="font-size:10px;font-weight:700;color:#b45309;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;">🚗 Citizen Reported Plate</div>
+            <div style="font-family:var(--font-display);font-weight:800;font-size:18px;color:#92400e;letter-spacing:2px;">${row.manualPlate || 'Not provided'}</div>
+          </div>
+          ${(row.plate && row.plate !== '—' && row.manualPlate) ? `
+          <div style="text-align:center;padding:4px 0;">
+            ${row.plate.replace(/[^A-Z0-9]/gi,'').toUpperCase() === row.manualPlate.replace(/[^A-Z0-9]/gi,'').toUpperCase()
+              ? '<span style="background:rgba(16,185,129,.1);color:#065f46;font-size:11px;font-weight:700;padding:3px 10px;border-radius:6px;border:1px solid rgba(16,185,129,.2);">✓ Plates Match</span>'
+              : '<span style="background:rgba(239,68,68,.08);color:#991b1b;font-size:11px;font-weight:700;padding:3px 10px;border-radius:6px;border:1px solid rgba(239,68,68,.15);">⚠ Plates Differ — Verify Manually</span>'
+            }
+          </div>
+          ` : ''}
           <div class="detail-drawer__row"><span class="detail-drawer__label">Location</span><span class="detail-drawer__value">${row.location}</span></div>
           <div class="detail-drawer__row"><span class="detail-drawer__label">AI Confidence</span><span class="detail-drawer__value">${row.confidence}%</span></div>
           <div class="detail-drawer__row"><span class="detail-drawer__label">Decision</span><span class="detail-drawer__value"><span class="decision-badge decision-badge--${row.decision}">${row.decision === 'approved' ? '✓ Approved' : '✕ Rejected'}</span></span></div>
           <div class="detail-drawer__row"><span class="detail-drawer__label">Reviewed By</span><span class="detail-drawer__value">${row.reviewer}</span></div>
           <div class="detail-drawer__row"><span class="detail-drawer__label">Date &amp; Time</span><span class="detail-drawer__value">${row.date} at ${row.time}</span></div>
-          <div class="detail-drawer__row"><span class="detail-drawer__label">Evidence Frames</span><span class="detail-drawer__value">${row.evidenceFrames} frames captured</span></div>
-          <div class="detail-drawer__row"><span class="detail-drawer__label">Response Time</span><span class="detail-drawer__value">${row.responseTime}</span></div>
-          <div class="detail-drawer__row"><span class="detail-drawer__label">AI Model</span><span class="detail-drawer__value"><span class="sys-badge sys-badge--info">${row.aiModel}</span></span></div>
+          ${row.helmet ? `<div class="detail-drawer__row"><span class="detail-drawer__label">Helmet Detection</span><span class="detail-drawer__value">${row.helmet}</span></div>` : ''}
         `;
         overlay.classList.add('detail-drawer-overlay--open');
         drawer.classList.add('detail-drawer--open');

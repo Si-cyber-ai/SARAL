@@ -256,13 +256,28 @@
     </div>
   </main>
 
+  <script src="js/api.js"></script>
   <script src="js/store.js"></script>
   <script src="js/auth.js"></script>
   <script>SaralAuth.requireAuth('authority');</script>
   <script src="js/dashboard.js"></script>
   <script>
-    (function () {
+    (async function () {
       'use strict';
+
+      /* ─── LOAD KPI STATS FROM API ─── */
+      try {
+        const stats = await SaralAPI.getAuthorityStats();
+        const total = (stats.approved || 0) + (stats.rejected || 0);
+        const approvalPct = total > 0 ? Math.round(stats.approved / total * 100) : 0;
+
+        const kpiReviewed = document.getElementById('kpiReviewed');
+        const kpiApproval = document.getElementById('kpiApproval');
+        if (kpiReviewed) kpiReviewed.textContent = total.toLocaleString();
+        if (kpiApproval) kpiApproval.innerHTML = approvalPct + '<span style="font-size: 16px; font-weight: 500; color: var(--gray-400);">%</span>';
+      } catch (err) {
+        console.error('[Analytics] Failed to load stats:', err);
+      }
 
       /* ─── CHART RENDERING (lightweight canvas, no library) ─── */
       const lineCanvas = document.getElementById('lineChart');

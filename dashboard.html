@@ -8,6 +8,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/dashboard.css" />
+  <!-- Leaflet.js for real maps -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
 <body class="dash-body">
 
@@ -254,20 +257,184 @@
         </div>
       </div>
 
-      <!-- Contribution Heatmap -->
+      <!-- Violation Hotspot Map -->
       <div class="dash-card dash-card--wide" data-reveal>
         <div class="dash-card__header">
-          <h3>Contribution Map</h3>
-          <span class="dash-card__sub">Last 12 weeks</span>
+          <h3>Violation Hotspot Map</h3>
+          <span class="dash-card__sub">Top locations by reported violations</span>
         </div>
-        <div class="dash-heatmap" id="heatmap"></div>
+        <div class="violation-map">
+          <div class="violation-map__leaflet" id="leafletMap"></div>
+          <div class="violation-map__legend">
+            <span class="violation-map__legend-label">Low</span>
+            <div class="violation-map__legend-bar"></div>
+            <span class="violation-map__legend-label">High</span>
+          </div>
+        </div>
+        <div class="violation-map__list" id="violationList"></div>
       </div>
     </div>
   </main>
 
+  <script src="js/api.js"></script>
   <script src="js/store.js"></script>
   <script src="js/auth.js"></script>
   <script>SaralAuth.requireAuth('user');</script>
   <script src="js/dashboard.js"></script>
+  <script>
+    // Load real data from API
+    (async function() {
+      const userId = SaralAuth.getUserId();
+      if (!userId) return;
+
+      try {
+        // Refresh user data from API
+        await SaralAuth.refreshUser();
+        const user = SaralAuth.getUser();
+        const state = SaralStore.get();
+
+        // Update greeting
+        const greetTitle = document.querySelector('.dash-greeting__title');
+        if (greetTitle) {
+          const firstName = user.name.split(' ')[0];
+          greetTitle.innerHTML = `Welcome back, <span class="text-gradient">${firstName}</span>`;
+        }
+
+        // Update sidebar profile
+        const profileName = document.querySelector('.sidebar__profile-name');
+        const profileAvatar = document.querySelector('.sidebar__profile-avatar span');
+        const profileBadge = document.querySelector('.sidebar__profile-badge');
+        if (profileName) profileName.textContent = user.name;
+        if (profileAvatar) profileAvatar.textContent = state.user.initials;
+        if (profileBadge) profileBadge.innerHTML = `<svg width="10" height="10" viewBox="0 0 10 10" fill="none"><circle cx="5" cy="5" r="4" fill="#FFD700"/></svg> ${state.user.tier} Champion`;
+
+        // Fetch stats from API
+        const stats = await SaralAPI.getUserStats(userId);
+
+        // Update stat cards
+        const statNums = document.querySelectorAll('.dash-stat__num');
+        if (statNums[0]) statNums[0].dataset.count = stats.total;
+        if (statNums[1]) statNums[1].dataset.count = stats.approved;
+        if (statNums[2]) statNums[2].dataset.count = stats.karma_points;
+        if (statNums[3]) statNums[3].dataset.count = stats.pending;
+
+        // Update trend for verified
+        const verifiedTrend = document.querySelectorAll('.dash-stat__trend');
+        if (verifiedTrend[1] && stats.total > 0) {
+          verifiedTrend[1].textContent = Math.round(stats.approved / stats.total * 100) + '%';
+        }
+
+        // Update tier badge
+        const tierBadge = document.querySelector('.dash-stat__badge');
+        if (tierBadge) tierBadge.textContent = state.user.tier;
+
+        // Update karma circle
+        const karmaNum = document.querySelector('.dash-karma__num');
+        if (karmaNum) karmaNum.textContent = stats.karma_points.toLocaleString();
+
+        // Update tier display
+        const tiers = [
+          { name: 'Bronze', min: 0, max: 500 },
+          { name: 'Silver', min: 500, max: 1000 },
+          { name: 'Gold', min: 1000, max: 1500 },
+          { name: 'Platinum', min: 1500, max: 2500 },
+          { name: 'Diamond', min: 2500, max: Infinity },
+        ];
+        let currentTier = tiers[0], nextTier = tiers[1];
+        for (let i = 0; i < tiers.length; i++) {
+          if (stats.karma_points >= tiers[i].min) { currentTier = tiers[i]; nextTier = tiers[i+1] || null; }
+        }
+        const karmaOf = document.querySelector('.dash-karma__of');
+        if (karmaOf && nextTier) karmaOf.textContent = `/ ${nextTier.min.toLocaleString()}`;
+
+        // Karma circle progress
+        const karmaCircle = document.querySelector('.dash-karma__circle circle:nth-child(2)');
+        if (karmaCircle && nextTier) {
+          const progress = (stats.karma_points - currentTier.min) / (nextTier.min - currentTier.min);
+          const circumference = 326.73;
+          karmaCircle.setAttribute('stroke-dashoffset', circumference * (1 - Math.min(progress, 1)));
+        }
+
+        // Update tier markers
+        const tierEls = document.querySelectorAll('.dash-karma__tier');
+        tierEls.forEach(el => {
+          const tierName = el.textContent.trim();
+          const tierIdx = tiers.findIndex(t => t.name === tierName);
+          const currentIdx = tiers.findIndex(t => t.name === currentTier.name);
+          el.classList.remove('dash-karma__tier--done', 'dash-karma__tier--current');
+          if (tierIdx < currentIdx) el.classList.add('dash-karma__tier--done');
+          if (tierIdx === currentIdx) el.classList.add('dash-karma__tier--current');
+        });
+
+        // Fetch and render recent reports
+        const reportsData = await SaralAPI.getUserReports(userId);
+        const reportsContainer = document.querySelector('.dash-reports');
+        if (reportsContainer && reportsData.reports) {
+          reportsContainer.innerHTML = '';
+          const recent = reportsData.reports.slice(0, 5);
+          if (recent.length === 0) {
+            reportsContainer.innerHTML = '<div style="text-align:center;padding:24px;color:#94a3b8;font-size:13px;">No reports yet. Submit your first report!</div>';
+          }
+          recent.forEach(r => {
+            const statusMap = { 'Under Review': 'pending', 'Approved': 'verified', 'Rejected': 'rejected' };
+            const statusCls = statusMap[r.status] || 'pending';
+            const statusLabel = r.status;
+            const iconColor = r.status === 'Approved' ? 'green' : r.status === 'Rejected' ? 'red' : 'amber';
+            const icon = r.status === 'Approved'
+              ? '<path d="M5 8l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>'
+              : '<path d="M8 3v5M8 11h.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>';
+
+            const date = new Date(r.created_at);
+            const now = new Date();
+            const diffH = Math.floor((now - date) / 3600000);
+            let timeStr;
+            if (diffH < 1) timeStr = 'Just now';
+            else if (diffH < 24) timeStr = diffH + 'h ago';
+            else if (diffH < 48) timeStr = 'Yesterday';
+            else timeStr = Math.floor(diffH / 24) + ' days ago';
+
+            const plateStr = r.plate_number ? ` — ${r.plate_number}` : '';
+
+            const el = document.createElement('div');
+            el.className = 'dash-report';
+            el.innerHTML = `
+              <div class="dash-report__icon dash-report__icon--${iconColor}">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">${icon}</svg>
+              </div>
+              <div class="dash-report__info">
+                <span class="dash-report__title">${r.violation_type}${plateStr}</span>
+                <span class="dash-report__time">${timeStr}</span>
+              </div>
+              <span class="dash-report__status dash-report__status--${statusCls}">${statusLabel}</span>
+            `;
+            reportsContainer.appendChild(el);
+          });
+        }
+
+        // Re-trigger counter animations
+        document.querySelectorAll('[data-count]').forEach(el => {
+          const target = parseInt(el.dataset.count, 10);
+          const duration = 1500;
+          const start = performance.now();
+          const easeOut = t => 1 - Math.pow(1 - t, 3);
+          const tick = (now) => {
+            const elapsed = now - start;
+            const progress = Math.min(elapsed / duration, 1);
+            el.textContent = Math.round(target * easeOut(progress)).toLocaleString();
+            if (progress < 1) requestAnimationFrame(tick);
+          };
+          requestAnimationFrame(tick);
+        });
+
+        // Update View all link
+        const viewAllLink = document.querySelector('.dash-card__link');
+        if (viewAllLink) viewAllLink.href = 'my-reports.html';
+
+      } catch (err) {
+        console.error('[Dashboard] Failed to load data:', err);
+        SaralToast.show('Failed to load dashboard data: ' + err.message, 'error');
+      }
+    })();
+  </script>
 </body>
 </html>

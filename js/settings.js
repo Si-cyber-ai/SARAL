@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════════════
    SARAL — Settings Page Logic
-   Profile, Privacy, Notifications tabs
+   API-backed profile, Privacy, Notifications tabs
    ═══════════════════════════════════════════════════ */
 
 (function () {
@@ -43,16 +43,28 @@
   const emailInput = document.getElementById('settingsEmail');
   const cityInput = document.getElementById('settingsCity');
 
-  nameInput.value = state.user.name;
-  emailInput.value = state.user.email;
-  cityInput.value = state.user.city;
+  // Load fresh user data from API
+  async function loadProfile() {
+    try {
+      await SaralAuth.refreshUser();
+    } catch (e) { /* ignore */ }
+    const s = SaralStore.get();
+    if (nameInput) nameInput.value = s.user.name || '';
+    if (emailInput) emailInput.value = s.user.email || '';
+    if (cityInput) cityInput.value = s.user.city || '';
 
-  document.getElementById('profileDisplayName').textContent = state.user.name;
-  document.getElementById('profileInitials').textContent = state.user.initials;
-  document.getElementById('profileTier').textContent = state.user.tier + ' Champion';
+    const displayName = document.getElementById('profileDisplayName');
+    const profileInitials = document.getElementById('profileInitials');
+    const profileTier = document.getElementById('profileTier');
+    if (displayName) displayName.textContent = s.user.name;
+    if (profileInitials) profileInitials.textContent = s.user.initials;
+    if (profileTier) profileTier.textContent = (s.user.tier || 'Bronze') + ' Champion';
+  }
 
-  // ─── Save Profile ───
-  document.getElementById('saveProfile').addEventListener('click', () => {
+  loadProfile();
+
+  // ─── Save Profile (API-backed) ───
+  document.getElementById('saveProfile').addEventListener('click', async () => {
     const name = nameInput.value.trim();
     const email = emailInput.value.trim();
     const city = cityInput.value.trim();
@@ -62,75 +74,95 @@
       return;
     }
 
-    SaralStore.set(s => {
-      s.user.name = name;
-      s.user.email = email;
-      s.user.city = city;
-      // Compute initials from name
-      const parts = name.split(' ').filter(Boolean);
-      s.user.initials = parts.length >= 2
-        ? (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
-        : name.substring(0, 2).toUpperCase();
-    });
+    const userId = SaralAuth.getUserId();
+    if (!userId) {
+      SaralToast.show('Please sign in again', 'error');
+      return;
+    }
 
-    // Update UI
-    document.getElementById('profileDisplayName').textContent = name;
-    document.getElementById('profileInitials').textContent = state.user.initials;
+    try {
+      const result = await SaralAPI.updateProfile(userId, name, email, city);
 
-    SaralToast.show('Profile saved successfully', 'success');
+      // Update local store
+      SaralStore.set(s => {
+        s.user.name = name;
+        s.user.email = email;
+        s.user.city = city;
+        const parts = name.split(' ').filter(Boolean);
+        s.user.initials = parts.length >= 2
+          ? (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+          : name.substring(0, 2).toUpperCase();
+      });
+
+      // Update UI
+      const displayName = document.getElementById('profileDisplayName');
+      const profileInitials = document.getElementById('profileInitials');
+      if (displayName) displayName.textContent = name;
+      if (profileInitials) profileInitials.textContent = SaralStore.get().user.initials;
+
+      SaralToast.show('Profile saved successfully', 'success');
+    } catch (err) {
+      SaralToast.show('Failed to save: ' + err.message, 'error');
+    }
   });
 
-  // ─── Privacy Toggles ───
+  // ─── Privacy Toggles (local only — no backend for these) ───
   const blurToggle = document.getElementById('toggleBlurPlates');
   const hideToggle = document.getElementById('toggleHideIdentity');
 
-  blurToggle.checked = state.settings.blurPlates;
-  hideToggle.checked = state.settings.hideIdentity;
+  if (blurToggle) {
+    blurToggle.checked = state.settings.blurPlates;
+    blurToggle.addEventListener('change', () => {
+      SaralStore.set(s => { s.settings.blurPlates = blurToggle.checked; });
+      SaralToast.show(
+        blurToggle.checked ? 'License plate blurring enabled' : 'License plate blurring disabled',
+        'info'
+      );
+    });
+  }
 
-  blurToggle.addEventListener('change', () => {
-    SaralStore.set(s => { s.settings.blurPlates = blurToggle.checked; });
-    SaralToast.show(
-      blurToggle.checked ? 'License plate blurring enabled' : 'License plate blurring disabled',
-      'info'
-    );
-  });
+  if (hideToggle) {
+    hideToggle.checked = state.settings.hideIdentity;
+    hideToggle.addEventListener('change', () => {
+      SaralStore.set(s => { s.settings.hideIdentity = hideToggle.checked; });
+      SaralToast.show(
+        hideToggle.checked ? 'Identity hidden on leaderboard' : 'Identity visible on leaderboard',
+        'info'
+      );
+    });
+  }
 
-  hideToggle.addEventListener('change', () => {
-    SaralStore.set(s => { s.settings.hideIdentity = hideToggle.checked; });
-    SaralToast.show(
-      hideToggle.checked ? 'Identity hidden on leaderboard' : 'Identity visible on leaderboard',
-      'info'
-    );
-  });
-
-  // ─── Notification Toggles ───
+  // ─── Notification Toggles (local only) ───
   const emailNotifToggle = document.getElementById('toggleEmailNotifs');
   const rewardAlertToggle = document.getElementById('toggleRewardAlerts');
 
-  emailNotifToggle.checked = state.settings.emailNotifs;
-  rewardAlertToggle.checked = state.settings.rewardAlerts;
+  if (emailNotifToggle) {
+    emailNotifToggle.checked = state.settings.emailNotifs;
+    emailNotifToggle.addEventListener('change', () => {
+      SaralStore.set(s => { s.settings.emailNotifs = emailNotifToggle.checked; });
+      SaralToast.show(
+        emailNotifToggle.checked ? 'Email notifications enabled' : 'Email notifications disabled',
+        'info'
+      );
+    });
+  }
 
-  emailNotifToggle.addEventListener('change', () => {
-    SaralStore.set(s => { s.settings.emailNotifs = emailNotifToggle.checked; });
-    SaralToast.show(
-      emailNotifToggle.checked ? 'Email notifications enabled' : 'Email notifications disabled',
-      'info'
-    );
-  });
-
-  rewardAlertToggle.addEventListener('change', () => {
-    SaralStore.set(s => { s.settings.rewardAlerts = rewardAlertToggle.checked; });
-    SaralToast.show(
-      rewardAlertToggle.checked ? 'Reward alerts enabled' : 'Reward alerts disabled',
-      'info'
-    );
-  });
+  if (rewardAlertToggle) {
+    rewardAlertToggle.checked = state.settings.rewardAlerts;
+    rewardAlertToggle.addEventListener('change', () => {
+      SaralStore.set(s => { s.settings.rewardAlerts = rewardAlertToggle.checked; });
+      SaralToast.show(
+        rewardAlertToggle.checked ? 'Reward alerts enabled' : 'Reward alerts disabled',
+        'info'
+      );
+    });
+  }
 
   // ─── Reset All Data ───
   document.getElementById('resetData').addEventListener('click', () => {
-    if (confirm('Are you sure you want to reset all data? This cannot be undone.')) {
+    if (confirm('Are you sure you want to reset all local data? This cannot be undone.')) {
       SaralStore.reset();
-      SaralToast.show('All data has been reset', 'info');
+      SaralToast.show('All local data has been reset', 'info');
       setTimeout(() => window.location.reload(), 800);
     }
   });

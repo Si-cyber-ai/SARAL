@@ -1,28 +1,10 @@
 /* ═══════════════════════════════════════════════════
    SARAL — Authentication & Role-Based Access Control
-   Vanilla JS auth context with role routing
+   API-backed auth with session persistence
    ═══════════════════════════════════════════════════ */
 
 const SaralAuth = (() => {
   const AUTH_KEY = 'saral_auth';
-  const USERS_KEY = 'saral_users';
-
-  // ─── Default mock users ───
-  const defaultUsers = [
-    { name: 'Aarav Kumar',      email: 'aarav@saral.in',      password: 'citizen123', role: 'user' },
-    { name: 'Insp. T. Prasad',  email: 'prasad@authority.in',  password: 'authority123', role: 'authority' },
-  ];
-
-  function getUsers() {
-    try {
-      const raw = localStorage.getItem(USERS_KEY);
-      return raw ? JSON.parse(raw) : [...defaultUsers];
-    } catch { return [...defaultUsers]; }
-  }
-
-  function saveUsers(users) {
-    localStorage.setItem(USERS_KEY, JSON.stringify(users));
-  }
 
   function getSession() {
     try {
@@ -34,12 +16,14 @@ const SaralAuth = (() => {
   function saveSession(session) {
     if (session) {
       localStorage.setItem(AUTH_KEY, JSON.stringify(session));
+      // Also sync to SaralStore if available
+      if (typeof SaralStore !== 'undefined' && SaralStore.syncUser) {
+        SaralStore.syncUser(session);
+      }
     } else {
       localStorage.removeItem(AUTH_KEY);
     }
   }
-
-  // ─── Public API ───
 
   function isAuthenticated() {
     return !!getSession();
@@ -54,42 +38,45 @@ const SaralAuth = (() => {
     return s ? s.role : null;
   }
 
-  function signIn(email, password, role) {
-    const users = getUsers();
-    const user = users.find(u =>
-      u.email.toLowerCase() === email.toLowerCase() &&
-      u.password === password &&
-      u.role === role
-    );
-    if (!user) return { success: false, error: 'Invalid credentials or role mismatch' };
-
-    const session = { name: user.name, email: user.email, role: user.role };
-    saveSession(session);
-    return { success: true, user: session };
+  function getUserId() {
+    const s = getSession();
+    return s ? s.id : null;
   }
 
-  function signUp(name, email, password, role) {
-    const users = getUsers();
-    if (users.find(u => u.email.toLowerCase() === email.toLowerCase())) {
-      return { success: false, error: 'An account with this email already exists' };
+  async function signIn(email, password, role) {
+    try {
+      const data = await SaralAPI.signIn(email, password, role);
+      if (data.success) {
+        saveSession(data.user);
+        return { success: true, user: data.user };
+      }
+      return { success: false, error: 'Invalid credentials' };
+    } catch (err) {
+      return { success: false, error: err.message };
     }
-    users.push({ name, email, password, role });
-    saveUsers(users);
+  }
 
-    const session = { name, email, role };
-    saveSession(session);
-    return { success: true, user: session };
+  async function signUp(name, email, password, role) {
+    try {
+      const data = await SaralAPI.signUp(name, email, password, role);
+      if (data.success) {
+        saveSession(data.user);
+        return { success: true, user: data.user };
+      }
+      return { success: false, error: 'Sign up failed' };
+    } catch (err) {
+      return { success: false, error: err.message };
+    }
   }
 
   function signOut() {
     saveSession(null);
-    // Replace history to prevent back-button access to dashboard
+    if (typeof SaralStore !== 'undefined') {
+      SaralStore.reset();
+    }
     window.location.replace('signin.html');
   }
 
-  /**
-   * Redirect based on role after login
-   */
   function redirectToDashboard() {
     const role = getRole();
     if (role === 'authority') {
@@ -101,10 +88,6 @@ const SaralAuth = (() => {
     }
   }
 
-  /**
-   * Guard: call on protected pages.
-   * @param {string|null} requiredRole - 'user', 'authority', or null (any authenticated)
-   */
   function requireAuth(requiredRole) {
     if (!isAuthenticated()) {
       window.location.href = 'signin.html';
@@ -114,23 +97,37 @@ const SaralAuth = (() => {
       window.location.href = 'signin.html';
       return false;
     }
+    // Sync user to store on page load
+    const session = getSession();
+    if (session && typeof SaralStore !== 'undefined' && SaralStore.syncUser) {
+      SaralStore.syncUser(session);
+    }
     return true;
   }
 
-  // Initialize default users into localStorage if not present
-  if (!localStorage.getItem(USERS_KEY)) {
-    saveUsers(defaultUsers);
+  /** Refresh user data from API */
+  async function refreshUser() {
+    const session = getSession();
+    if (!session || !session.id) return;
+    try {
+      const fresh = await SaralAPI.getUser(session.id);
+      saveSession({ ...session, ...fresh });
+    } catch (e) {
+      console.warn('[Auth] Failed to refresh user:', e.message);
+    }
   }
 
   return {
     isAuthenticated,
     getUser,
     getRole,
+    getUserId,
     signIn,
     signUp,
     signOut,
     redirectToDashboard,
     requireAuth,
+    refreshUser,
   };
 })();
 

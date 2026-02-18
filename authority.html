@@ -9,6 +9,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/dashboard.css" />
   <link rel="stylesheet" href="css/authority.css" />
+  <style>
+    @keyframes citizenPlatePop { 0% { transform: scale(0.7); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+  </style>
 </head>
 <body class="dash-body">
 
@@ -84,15 +87,15 @@
     <!-- Overview Stats -->
     <div class="auth-overview" data-reveal>
       <div class="auth-stat auth-stat--pending">
-        <span class="auth-stat__num" data-count="18">0</span>
+        <span class="auth-stat__num" id="statPending">0</span>
         <span class="auth-stat__label">Pending Review</span>
       </div>
       <div class="auth-stat auth-stat--reviewed">
-        <span class="auth-stat__num" data-count="124">0</span>
-        <span class="auth-stat__label">Reviewed This Week</span>
+        <span class="auth-stat__num" id="statReviewed">0</span>
+        <span class="auth-stat__label">Reviewed Total</span>
       </div>
       <div class="auth-stat auth-stat--actioned">
-        <span class="auth-stat__num" data-count="89">0</span>
+        <span class="auth-stat__num" id="statActioned">0</span>
         <span class="auth-stat__label">Actions Taken (%)</span>
       </div>
     </div>
@@ -102,101 +105,12 @@
       <div class="dash-card dash-card--wide" data-reveal>
         <div class="dash-card__header">
           <h3>Priority Cases</h3>
-          <div class="dash-card__tabs">
-            <button class="dash-card__tab dash-card__tab--active">All</button>
-            <button class="dash-card__tab">High</button>
-            <button class="dash-card__tab">Medium</button>
-          </div>
         </div>
-        <div class="case-queue">
-          <div class="case-item">
-            <div class="case-item__priority case-item__priority--high"></div>
-            <div class="case-item__info">
-              <span class="case-item__type">Signal Jumping — KA-01-AB-1234</span>
-              <div class="case-item__meta">
-                <span>MG Road, Bangalore</span>
-                <span>2h ago</span>
-              </div>
-            </div>
-            <span class="case-item__ai">
-              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="4" stroke="currentColor" stroke-width="1.2"/><circle cx="6" cy="6" r="1.5" fill="currentColor"/></svg>
-              AI: 97% match
-            </span>
-            <div class="case-item__actions">
-              <button class="case-action case-action--approve" title="Approve">
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M4 7l2.5 2.5L10 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              </button>
-              <button class="case-action case-action--reject" title="Dismiss">
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M4 4l6 6M10 4l-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-              </button>
-            </div>
+        <div class="case-queue" id="caseQueue">
+          <div class="case-item" id="caseEmpty" style="display:none; justify-content:center; padding: 40px; color: #94a3b8;">
+            <p>No pending cases — all caught up!</p>
           </div>
-          <div class="case-item">
-            <div class="case-item__priority case-item__priority--high"></div>
-            <div class="case-item__info">
-              <span class="case-item__type">Wrong-Way Driving — DL-02-CD-5678</span>
-              <div class="case-item__meta">
-                <span>NH-48, Delhi</span>
-                <span>3h ago</span>
-              </div>
-            </div>
-            <span class="case-item__ai">
-              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="4" stroke="currentColor" stroke-width="1.2"/><circle cx="6" cy="6" r="1.5" fill="currentColor"/></svg>
-              AI: 94% match
-            </span>
-            <div class="case-item__actions">
-              <button class="case-action case-action--approve" title="Approve">
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M4 7l2.5 2.5L10 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              </button>
-              <button class="case-action case-action--reject" title="Dismiss">
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M4 4l6 6M10 4l-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-              </button>
-            </div>
-          </div>
-          <div class="case-item">
-            <div class="case-item__priority case-item__priority--medium"></div>
-            <div class="case-item__info">
-              <span class="case-item__type">Over Speeding — MH-12-EF-9012</span>
-              <div class="case-item__meta">
-                <span>Pune-Mumbai Expressway</span>
-                <span>5h ago</span>
-              </div>
-            </div>
-            <span class="case-item__ai">
-              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="4" stroke="currentColor" stroke-width="1.2"/><circle cx="6" cy="6" r="1.5" fill="currentColor"/></svg>
-              AI: 88% match
-            </span>
-            <div class="case-item__actions">
-              <button class="case-action case-action--approve" title="Approve">
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M4 7l2.5 2.5L10 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              </button>
-              <button class="case-action case-action--reject" title="Dismiss">
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M4 4l6 6M10 4l-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-              </button>
-            </div>
-          </div>
-          <div class="case-item">
-            <div class="case-item__priority case-item__priority--low"></div>
-            <div class="case-item__info">
-              <span class="case-item__type">Illegal Parking — KA-05-GH-3456</span>
-              <div class="case-item__meta">
-                <span>Sector 17, Chandigarh</span>
-                <span>8h ago</span>
-              </div>
-            </div>
-            <span class="case-item__ai">
-              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="4" stroke="currentColor" stroke-width="1.2"/><circle cx="6" cy="6" r="1.5" fill="currentColor"/></svg>
-              AI: 91% match
-            </span>
-            <div class="case-item__actions">
-              <button class="case-action case-action--approve" title="Approve">
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M4 7l2.5 2.5L10 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              </button>
-              <button class="case-action case-action--reject" title="Dismiss">
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M4 4l6 6M10 4l-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-              </button>
-            </div>
-          </div>
+          <!-- Dynamically populated from API -->
         </div>
       </div>
 
@@ -239,6 +153,21 @@
     </div>
   </main>
 
+  <!-- ═══ DETAIL DRAWER (slides in when a case is clicked) ═══ -->
+  <div class="detail-drawer-overlay" id="drawerOverlay"></div>
+  <div class="detail-drawer" id="detailDrawer">
+    <div class="detail-drawer__header">
+      <span class="detail-drawer__title" id="drawerTitle">Case Details</span>
+      <button class="detail-drawer__close" id="drawerClose">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M5 5l8 8M13 5l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="detail-drawer__body" id="drawerBody">
+      <!-- JS populated -->
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
   <script src="js/store.js"></script>
   <script src="js/auth.js"></script>
   <script>SaralAuth.requireAuth('authority');</script>
@@ -247,13 +176,127 @@
     (function () {
       'use strict';
 
-      // ─── Approve / Reject case actions ───
-      const caseQueue = document.querySelector('.case-queue');
+      const caseQueue = document.getElementById('caseQueue');
+      const caseEmpty = document.getElementById('caseEmpty');
       if (!caseQueue) return;
 
-      let pendingCount = parseInt(document.querySelector('.auth-stat:first-child .auth-stat__num')?.textContent || '0', 10);
+      function formatTimeAgo(iso) {
+        const d = new Date(iso);
+        const diff = Date.now() - d.getTime();
+        const mins = Math.floor(diff / 60000);
+        if (mins < 1) return 'Just now';
+        if (mins < 60) return mins + 'm ago';
+        const hrs = Math.floor(mins / 60);
+        if (hrs < 24) return hrs + 'h ago';
+        const days = Math.floor(hrs / 24);
+        return days + 'd ago';
+      }
 
-      caseQueue.addEventListener('click', function (e) {
+      function priorityLevel(confidence) {
+        if (confidence >= 90) return 'high';
+        if (confidence >= 70) return 'medium';
+        return 'low';
+      }
+
+      function buildCaseItem(report) {
+        const priority = priorityLevel(report.confidence);
+        const time = formatTimeAgo(report.created_at);
+        const div = document.createElement('div');
+        div.className = 'case-item';
+        div.dataset.reportId = report.id;
+        div.style.cursor = 'pointer';
+
+        const thumbnailHtml = report.media_url
+          ? `<img src="${SaralAPI.mediaUrl(report.media_url)}" 
+               style="width:48px;height:48px;object-fit:cover;border-radius:10px;flex-shrink:0;border:1px solid rgba(0,0,0,.08);" 
+               alt="Evidence" />`
+          : '';
+
+        // Plate badges row — always show both for quick classification
+        let plateBadges = '<div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:4px;">';
+        // AI OCR plate
+        plateBadges += `<span style="display:inline-flex;align-items:center;gap:3px;background:rgba(79,140,255,.1);color:#1e40af;font-size:10px;font-weight:700;padding:2px 7px;border-radius:5px;font-family:var(--font-display);letter-spacing:.4px;border:1px solid rgba(79,140,255,.2);" title="AI detected plate">🤖 ${report.plate_number || 'Not detected'}</span>`;
+        // Citizen reported plate
+        if (report.manual_plate) {
+          plateBadges += `<span style="display:inline-flex;align-items:center;gap:3px;background:linear-gradient(135deg,rgba(251,191,36,.15),rgba(245,158,11,.1));color:#78350f;font-size:10px;font-weight:700;padding:2px 7px;border-radius:5px;font-family:var(--font-display);letter-spacing:.4px;border:1px solid rgba(251,191,36,.3);animation:citizenPlatePop .3s ease-out;" title="Citizen reported plate">🚗 ${report.manual_plate}</span>`;
+        }
+        plateBadges += '</div>';
+
+        div.innerHTML = `
+          <div class="case-item__priority case-item__priority--${priority}"></div>
+          ${thumbnailHtml}
+          <div class="case-item__info">
+            <span class="case-item__type">${report.violation_type}</span>
+            ${plateBadges}
+            <div class="case-item__meta">
+              <span>${report.location || 'No location'}</span>
+              <span>${time}</span>
+              <span style="color:#64748b;font-size:11px;">by ${report.reporter_name || 'Citizen'}</span>
+            </div>
+          </div>
+          <span class="case-item__ai">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="4" stroke="currentColor" stroke-width="1.2"/><circle cx="6" cy="6" r="1.5" fill="currentColor"/></svg>
+            AI: ${report.confidence}% match
+          </span>
+          <div class="case-item__actions">
+            <button class="case-action case-action--approve" title="Approve" data-id="${report.id}">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M4 7l2.5 2.5L10 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <button class="case-action case-action--reject" title="Dismiss" data-id="${report.id}">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M4 4l6 6M10 4l-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </button>
+          </div>
+        `;
+
+        // Click on the case info area (not buttons) opens the detail drawer
+        div.addEventListener('click', function (e) {
+          if (e.target.closest('.case-action')) return; // don't open drawer on button click
+          openDrawer(report);
+        });
+
+        return div;
+      }
+
+      // Load stats
+      async function loadStats() {
+        try {
+          const stats = await SaralAPI.getAuthorityStats();
+          const pEl = document.getElementById('statPending');
+          const rEl = document.getElementById('statReviewed');
+          const aEl = document.getElementById('statActioned');
+          if (pEl) { pEl.dataset.count = stats.pending; pEl.textContent = stats.pending; }
+          if (rEl) { rEl.dataset.count = stats.approved + stats.rejected; rEl.textContent = stats.approved + stats.rejected; }
+          if (aEl) { aEl.dataset.count = stats.action_pct; aEl.textContent = stats.action_pct; }
+        } catch (err) {
+          console.error('[Authority] Stats failed:', err);
+        }
+      }
+
+      // Load pending reports
+      async function loadPendingCases() {
+        try {
+          const data = await SaralAPI.getPendingReports();
+          const reports = data.reports || [];
+
+          // Clear existing case items (but keep empty state div)
+          caseQueue.querySelectorAll('.case-item:not(#caseEmpty)').forEach(el => el.remove());
+
+          if (reports.length === 0) {
+            caseEmpty.style.display = 'flex';
+          } else {
+            caseEmpty.style.display = 'none';
+            reports.forEach(r => {
+              caseQueue.appendChild(buildCaseItem(r));
+            });
+          }
+        } catch (err) {
+          console.error('[Authority] Failed to load cases:', err);
+          SaralToast.show('Failed to load cases: ' + err.message, 'error');
+        }
+      }
+
+      // Handle approve/reject via event delegation
+      caseQueue.addEventListener('click', async function (e) {
         const approveBtn = e.target.closest('.case-action--approve');
         const rejectBtn = e.target.closest('.case-action--reject');
         if (!approveBtn && !rejectBtn) return;
@@ -262,61 +305,195 @@
         if (!caseItem || caseItem.classList.contains('case-item--handled')) return;
         caseItem.classList.add('case-item--handled');
 
+        const reportId = caseItem.dataset.reportId;
         const caseType = caseItem.querySelector('.case-item__type')?.textContent || 'Case';
 
         if (approveBtn) {
-          // Approved — animate out green
-          caseItem.style.transition = 'all 0.4s cubic-bezier(0.16,1,0.3,1)';
-          caseItem.style.background = 'rgba(16,185,129,.06)';
-          caseItem.style.borderColor = 'rgba(16,185,129,.2)';
+          try {
+            const result = await SaralAPI.approveReport(reportId);
 
-          setTimeout(function () {
-            caseItem.style.opacity = '0';
-            caseItem.style.transform = 'translateX(30px)';
-            caseItem.style.maxHeight = '0';
-            caseItem.style.padding = '0';
-            caseItem.style.margin = '0';
-            caseItem.style.overflow = 'hidden';
-          }, 400);
+            caseItem.style.transition = 'all 0.4s cubic-bezier(0.16,1,0.3,1)';
+            caseItem.style.background = 'rgba(16,185,129,.06)';
+            caseItem.style.borderColor = 'rgba(16,185,129,.2)';
 
-          setTimeout(function () { caseItem.remove(); }, 800);
+            setTimeout(() => {
+              caseItem.style.opacity = '0';
+              caseItem.style.transform = 'translateX(30px)';
+              caseItem.style.maxHeight = '0';
+              caseItem.style.padding = '0';
+              caseItem.style.margin = '0';
+              caseItem.style.overflow = 'hidden';
+            }, 400);
 
-          if (typeof SaralToast !== 'undefined') {
-            SaralToast.show('✅ Verified: ' + caseType.split('—')[0].trim(), 'success');
+            setTimeout(() => { caseItem.remove(); checkEmpty(); }, 800);
+
+            SaralToast.show(`✅ Approved: ${caseType.split('—')[0].trim()} (+${result.karma_awarded} karma to reporter)`, 'success');
+            updatePendingStat(-1);
+          } catch (err) {
+            caseItem.classList.remove('case-item--handled');
+            SaralToast.show('Approve failed: ' + err.message, 'error');
           }
-
-          // Update stat
-          pendingCount = Math.max(0, pendingCount - 1);
-          const statEl = document.querySelector('.auth-stat:first-child .auth-stat__num');
-          if (statEl) statEl.textContent = pendingCount;
         }
 
         if (rejectBtn) {
-          // Rejected — animate out red
-          caseItem.style.transition = 'all 0.4s cubic-bezier(0.16,1,0.3,1)';
-          caseItem.style.background = 'rgba(239,68,68,.04)';
-          caseItem.style.borderColor = 'rgba(239,68,68,.15)';
+          try {
+            await SaralAPI.rejectReport(reportId);
 
-          setTimeout(function () {
-            caseItem.style.opacity = '0';
-            caseItem.style.transform = 'translateX(-30px)';
-            caseItem.style.maxHeight = '0';
-            caseItem.style.padding = '0';
-            caseItem.style.margin = '0';
-            caseItem.style.overflow = 'hidden';
-          }, 400);
+            caseItem.style.transition = 'all 0.4s cubic-bezier(0.16,1,0.3,1)';
+            caseItem.style.background = 'rgba(239,68,68,.04)';
+            caseItem.style.borderColor = 'rgba(239,68,68,.15)';
 
-          setTimeout(function () { caseItem.remove(); }, 800);
+            setTimeout(() => {
+              caseItem.style.opacity = '0';
+              caseItem.style.transform = 'translateX(-30px)';
+              caseItem.style.maxHeight = '0';
+              caseItem.style.padding = '0';
+              caseItem.style.margin = '0';
+              caseItem.style.overflow = 'hidden';
+            }, 400);
 
-          if (typeof SaralToast !== 'undefined') {
+            setTimeout(() => { caseItem.remove(); checkEmpty(); }, 800);
+
             SaralToast.show('Dismissed: ' + caseType.split('—')[0].trim(), 'info');
+            updatePendingStat(-1);
+          } catch (err) {
+            caseItem.classList.remove('case-item--handled');
+            SaralToast.show('Reject failed: ' + err.message, 'error');
           }
-
-          pendingCount = Math.max(0, pendingCount - 1);
-          const statEl = document.querySelector('.auth-stat:first-child .auth-stat__num');
-          if (statEl) statEl.textContent = pendingCount;
         }
       });
+
+      function updatePendingStat(delta) {
+        const el = document.getElementById('statPending');
+        if (el) {
+          const current = parseInt(el.textContent) || 0;
+          el.textContent = Math.max(0, current + delta);
+        }
+      }
+
+      function checkEmpty() {
+        const remaining = caseQueue.querySelectorAll('.case-item:not(#caseEmpty):not(.case-item--handled)');
+        if (remaining.length === 0) {
+          caseEmpty.style.display = 'flex';
+        }
+      }
+
+      // Update sidebar profile
+      async function updateSidebar() {
+        const user = SaralAuth.getUser();
+        const profileName = document.querySelector('.sidebar__profile-name');
+        if (profileName && user.name) profileName.textContent = user.name;
+      }
+
+      /* ─── DETAIL DRAWER ─── */
+      const overlay = document.getElementById('drawerOverlay');
+      const drawer  = document.getElementById('detailDrawer');
+      const drawerTitle = document.getElementById('drawerTitle');
+      const drawerBody  = document.getElementById('drawerBody');
+      const drawerClose = document.getElementById('drawerClose');
+
+      function openDrawer(report) {
+        drawerTitle.textContent = report.violation_type + (report.plate_number ? ' — ' + report.plate_number : '');
+
+        // Build the AI-annotated image section
+        const annotatedSrc = report.annotated_url ? SaralAPI.mediaUrl(report.annotated_url) : null;
+        const originalSrc = report.media_url ? SaralAPI.mediaUrl(report.media_url) : null;
+
+        let imageSection = '';
+        if (annotatedSrc) {
+          imageSection = `
+            <div style="margin-bottom:16px;">
+              <div style="font-size:12px;font-weight:600;color:var(--gray-500);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px;">AI Detection Result</div>
+              <img src="${annotatedSrc}" style="width:100%;border-radius:12px;border:1px solid rgba(0,0,0,.08);cursor:pointer;" alt="AI Annotated" onclick="window.open(this.src,'_blank')" title="Click to view full size" />
+              <div style="font-size:11px;color:var(--gray-400);margin-top:4px;text-align:center;">Bounding boxes show detected plates &amp; helmets</div>
+            </div>
+          `;
+        }
+        if (originalSrc) {
+          imageSection += `
+            <div style="margin-bottom:16px;">
+              <div style="font-size:12px;font-weight:600;color:var(--gray-500);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px;">Original Evidence</div>
+              <img src="${originalSrc}" style="width:100%;border-radius:12px;border:1px solid rgba(0,0,0,.08);cursor:pointer;" alt="Original Evidence" onclick="window.open(this.src,'_blank')" title="Click to view full size" />
+            </div>
+          `;
+        }
+
+        const timeStr = report.created_at ? new Date(report.created_at).toLocaleString() : '—';
+
+        drawerBody.innerHTML = `
+          ${imageSection}
+          <div class="detail-drawer__row"><span class="detail-drawer__label">Report ID</span><span class="detail-drawer__value" style="font-family:var(--font-display);font-weight:700;">SARAL-${String(report.id).padStart(6,'0')}</span></div>
+          <div class="detail-drawer__row"><span class="detail-drawer__label">Violation Type</span><span class="detail-drawer__value">${report.violation_type}</span></div>
+          <div style="background:rgba(79,140,255,.06);border-radius:12px;padding:12px 14px;margin:4px -4px;border:1px solid rgba(79,140,255,.15);">
+            <div style="font-size:10px;font-weight:700;color:#3b82f6;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;">🤖 AI Detected Plate (OCR)</div>
+            <div style="font-family:var(--font-display);font-weight:800;font-size:18px;color:#1e3a5f;letter-spacing:2px;">${report.plate_number || 'Not detected'}</div>
+          </div>
+          <div style="background:linear-gradient(135deg,rgba(251,191,36,.08),rgba(245,158,11,.05));border-radius:12px;padding:12px 14px;margin:4px -4px;border:1px solid rgba(251,191,36,.2);">
+            <div style="font-size:10px;font-weight:700;color:#b45309;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;">🚗 Citizen Reported Plate</div>
+            <div style="font-family:var(--font-display);font-weight:800;font-size:18px;color:#92400e;letter-spacing:2px;">${report.manual_plate || 'Not provided'}</div>
+          </div>
+          ${(report.plate_number && report.manual_plate) ? `
+          <div style="text-align:center;padding:4px 0;">
+            ${report.plate_number.replace(/[^A-Z0-9]/gi,'').toUpperCase() === report.manual_plate.replace(/[^A-Z0-9]/gi,'').toUpperCase()
+              ? '<span style="background:rgba(16,185,129,.1);color:#065f46;font-size:11px;font-weight:700;padding:3px 10px;border-radius:6px;border:1px solid rgba(16,185,129,.2);">✓ Plates Match</span>'
+              : '<span style="background:rgba(239,68,68,.08);color:#991b1b;font-size:11px;font-weight:700;padding:3px 10px;border-radius:6px;border:1px solid rgba(239,68,68,.15);">⚠ Plates Differ — Verify Manually</span>'
+            }
+          </div>
+          ` : ''}
+          <div class="detail-drawer__row"><span class="detail-drawer__label">AI Confidence</span><span class="detail-drawer__value">${report.confidence}%</span></div>
+          <div class="detail-drawer__row"><span class="detail-drawer__label">Location</span><span class="detail-drawer__value">${report.location || '—'}</span></div>
+          <div class="detail-drawer__row"><span class="detail-drawer__label">Reported By</span><span class="detail-drawer__value">${report.reporter_name || 'Citizen'}</span></div>
+          <div class="detail-drawer__row"><span class="detail-drawer__label">Date &amp; Time</span><span class="detail-drawer__value">${timeStr}</span></div>
+          ${report.helmet_detected ? `<div class="detail-drawer__row"><span class="detail-drawer__label">Helmet Detection</span><span class="detail-drawer__value">${report.helmet_detected}</span></div>` : ''}
+          ${report.description ? `<div class="detail-drawer__row"><span class="detail-drawer__label">Description</span><span class="detail-drawer__value">${report.description}</span></div>` : ''}
+          <div style="margin-top:20px;display:flex;gap:10px;">
+            <button class="case-action case-action--approve" style="flex:1;padding:10px;border-radius:10px;font-size:13px;font-weight:600;" onclick="drawerApprove(${report.id})">✓ Approve</button>
+            <button class="case-action case-action--reject" style="flex:1;padding:10px;border-radius:10px;font-size:13px;font-weight:600;" onclick="drawerReject(${report.id})">✕ Reject</button>
+          </div>
+        `;
+        overlay.classList.add('detail-drawer-overlay--open');
+        drawer.classList.add('detail-drawer--open');
+      }
+
+      function closeDrawerFn() {
+        overlay.classList.remove('detail-drawer-overlay--open');
+        drawer.classList.remove('detail-drawer--open');
+      }
+
+      if (drawerClose) drawerClose.addEventListener('click', closeDrawerFn);
+      if (overlay) overlay.addEventListener('click', closeDrawerFn);
+      document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeDrawerFn(); });
+
+      // Drawer approve/reject actions
+      window.drawerApprove = async function (reportId) {
+        try {
+          const result = await SaralAPI.approveReport(reportId);
+          SaralToast.show(`✅ Approved (+${result.karma_awarded} karma to reporter)`, 'success');
+          closeDrawerFn();
+          // Remove the case from queue
+          const item = caseQueue.querySelector(`.case-item[data-report-id="${reportId}"]`);
+          if (item) { item.remove(); checkEmpty(); updatePendingStat(-1); }
+        } catch (err) {
+          SaralToast.show('Approve failed: ' + err.message, 'error');
+        }
+      };
+
+      window.drawerReject = async function (reportId) {
+        try {
+          await SaralAPI.rejectReport(reportId);
+          SaralToast.show('Dismissed', 'info');
+          closeDrawerFn();
+          const item = caseQueue.querySelector(`.case-item[data-report-id="${reportId}"]`);
+          if (item) { item.remove(); checkEmpty(); updatePendingStat(-1); }
+        } catch (err) {
+          SaralToast.show('Reject failed: ' + err.message, 'error');
+        }
+      };
+
+      // Init
+      loadStats();
+      loadPendingCases();
+      updateSidebar();
     })();
   </script>
 </body>

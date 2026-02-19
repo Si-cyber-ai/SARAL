@@ -381,11 +381,12 @@
             }, 400);
             setTimeout(() => { caseItem.remove(); checkEmpty(); }, 800);
 
-            // ── Toast: parking-specific vs helmet/plate ────────────────────
+            // ── Toast: parking-specific vs helmet/plate ─────────────────
             const isParking = result.source === 'parking';
+            const smsSuffix = result.sms_sent ? ' 📱 SMS sent' : '';
             const toastMsg = isParking
-              ? `✅ Parking violation approved${result.vehicle_type ? ' — ' + result.vehicle_type : ''} · +${result.karma_awarded} karma to reporter`
-              : `✅ Approved: ${caseType.split('—')[0].trim()} · +${result.karma_awarded} karma to reporter`;
+              ? `✅ Parking violation approved${result.vehicle_type ? ' — ' + result.vehicle_type : ''} · +${result.karma_awarded} karma to reporter${smsSuffix}`
+              : `✅ Approved: ${caseType.split('—')[0].trim()} · +${result.karma_awarded} karma to reporter${smsSuffix}`;
             SaralToast.show(toastMsg, 'success');
 
             // ── Instant stat update ────────────────────────────────────────
@@ -416,9 +417,10 @@
             setTimeout(() => { caseItem.remove(); checkEmpty(); }, 800);
 
             const isParking = result.source === 'parking';
+            const smsSuffix = result.sms_sent ? ' 📱 SMS sent' : '';
             const toastMsg = isParking
-              ? `Dismissed: Parking violation — ${caseType.split('—')[0].trim()}`
-              : `Dismissed: ${caseType.split('—')[0].trim()}`;
+              ? `Dismissed: Parking violation — ${caseType.split('—')[0].trim()}${smsSuffix}`
+              : `Dismissed: ${caseType.split('—')[0].trim()}${smsSuffix}`;
             SaralToast.show(toastMsg, 'info');
 
             updatePendingStat(-1);
@@ -584,11 +586,12 @@
         try {
           const result = await SaralAPI.approveReport(reportId);
 
-          // ── Parking-aware toast ────────────────────────────────────────
+          // ── Parking-aware toast ──────────────────────────────────
           const isParking = result.source === 'parking';
+          const smsSuffix = result.sms_sent ? ' 📱 SMS sent' : '';
           const toastMsg = isParking
-            ? `✅ Parking violation approved${result.vehicle_type ? ' — ' + result.vehicle_type : ''} · +${result.karma_awarded} karma to reporter`
-            : `✅ Approved: ${result.violation_type || 'Case'} · +${result.karma_awarded} karma to reporter`;
+            ? `✅ Parking violation approved${result.vehicle_type ? ' — ' + result.vehicle_type : ''} · +${result.karma_awarded} karma to reporter${smsSuffix}`
+            : `✅ Approved: ${result.violation_type || 'Case'} · +${result.karma_awarded} karma to reporter${smsSuffix}`;
           SaralToast.show(toastMsg, 'success');
 
           closeDrawerFn();
@@ -613,9 +616,10 @@
           const result = await SaralAPI.rejectReport(reportId);
 
           const isParking = result.source === 'parking';
+          const smsSuffix = result.sms_sent ? ' 📱 SMS sent' : '';
           const toastMsg = isParking
-            ? `Dismissed: Parking violation — ${result.violation_type || 'Case'}`
-            : `Dismissed: ${result.violation_type || 'Case'}`;
+            ? `Dismissed: Parking violation — ${result.violation_type || 'Case'}${smsSuffix}`
+            : `Dismissed: ${result.violation_type || 'Case'}${smsSuffix}`;
           SaralToast.show(toastMsg, 'info');
 
           closeDrawerFn();

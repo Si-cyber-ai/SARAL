@@ -24,7 +24,15 @@ sys.path.insert(0, MODELS_DIR)
 
 import database as db
 
-# ─── Initialise the database (create tables + seed users) ───
+# SMS notification service (Twilio) — fails gracefully if not configured
+try:
+    import sms_service
+    SMS_AVAILABLE = True
+except ImportError:
+    SMS_AVAILABLE = False
+    print("[WARNING] sms_service not available — SMS notifications disabled.")
+
+# ── Initialise the database (create tables + seed users) ───
 db.init_db()
 
 # ─── Try importing the plate/helmet AI model (graceful fallback if deps missing) ───
@@ -620,11 +628,32 @@ async def approve_report(report_id: int):
     # Award karma points to the reporter
     new_balance = db.update_user_karma(report["user_id"], karma_to_award)
 
+    # ── Send SMS notification (non-blocking) ──────────────────────────────────
+    sms_sent = False
+    if SMS_AVAILABLE:
+        try:
+            import threading
+            threading.Thread(
+                target=sms_service.send_approval_sms,
+                kwargs=dict(
+                    plate=report.get("plate_number", ""),
+                    violation_type=report.get("violation_type", "Traffic Violation"),
+                    location=report.get("location", ""),
+                    fine=None,   # auto-determined from violation_type in sms_service
+                ),
+                daemon=True,
+            ).start()
+            sms_sent = True
+            print(f"[SMS] Approval SMS queued for report #{report_id}")
+        except Exception as sms_err:
+            print(f"[SMS] Failed to queue approval SMS: {sms_err}")
+
     return {
         "success"           : True,
         "report"            : updated,
         "karma_awarded"     : karma_to_award,
         "user_karma_balance": new_balance,
+        "sms_sent"          : sms_sent,
         # Extra context so the frontend can tailor its toast / UI update
         "source"            : source,
         "fine_amount"       : report.get("fine_amount", ""),
@@ -644,9 +673,25 @@ async def reject_report(report_id: int):
 
     updated = db.update_report_status(report_id, "Rejected")
 
+    # ── Send SMS notification (non-blocking) ──────────────────────────────────
+    sms_sent = False
+    if SMS_AVAILABLE:
+        try:
+            import threading
+            threading.Thread(
+                target=sms_service.send_rejection_sms,
+                kwargs=dict(plate=report.get("plate_number", "")),
+                daemon=True,
+            ).start()
+            sms_sent = True
+            print(f"[SMS] Rejection SMS queued for report #{report_id}")
+        except Exception as sms_err:
+            print(f"[SMS] Failed to queue rejection SMS: {sms_err}")
+
     return {
         "success"       : True,
         "report"        : updated,
+        "sms_sent"      : sms_sent,
         "source"        : report.get("source", "helmet_plate"),
         "violation_type": report.get("violation_type", ""),
     }

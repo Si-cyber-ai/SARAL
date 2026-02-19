@@ -29,3 +29,7 @@ Pillow>=9.0.0
 
 # Plotting (used by model.py for annotation)
 matplotlib>=3.7.0
+
+# ── SMS notifications (Twilio) ─────────────────────────────────────────────
+twilio>=9.0.0
+python-dotenv>=1.0.0      # loads backend/.env into os.environ

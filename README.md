@@ -1,4 +1,4 @@
-# SARAL — Smart Automated Recognition of Automobile Licenses
+# ARAL – AI-Powered Traffic Violation Reporting System
 
 > **A civic-tech platform for AI-powered traffic violation reporting and community-driven road safety.**
 
